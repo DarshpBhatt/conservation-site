@@ -1,0 +1,14 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+body {
+  font-family: 'Calibri', sans-serif;
+  line-height: 1.5;
+  color: #555; /* Adjust color to ensure medium/bright contrast */
+}
+
+a {
+  display: block;
+  text-decoration: none;
+  overflow-wrap: break-word; /* Ensures no word-breaking over lines */
+}

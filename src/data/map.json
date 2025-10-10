@@ -1,0 +1,98 @@
+{
+  "center": { "lat": 44.623917, "lng": -63.920472, "zoom": 17 },
+  "nearbyThresholdMeters": 50,
+  "talkingTreesMeters": 3,
+  "pollIntervalSeconds": 15,
+  "areas": {
+    "siteBorder": [
+      [44.624817, -63.921472],
+      [44.624817, -63.919472],
+      [44.623017, -63.919472],
+      [44.623017, -63.921472],
+      [44.624817, -63.921472]
+    ],
+    "rewildingArea": [
+      [44.624400, -63.920900],
+      [44.624300, -63.920100],
+      [44.623700, -63.920100],
+      [44.623700, -63.920900],
+      [44.624400, -63.920900]
+    ],
+    "yellowBirchArea": [
+      [44.624600, -63.919900],
+      [44.624600, -63.919300],
+      [44.624100, -63.919300],
+      [44.624100, -63.919900],
+      [44.624600, -63.919900]
+    ],
+    "wetlandArea": [
+      [44.623500, -63.921300],
+      [44.623500, -63.920700],
+      [44.623000, -63.920700],
+      [44.623000, -63.921300],
+      [44.623500, -63.921300]
+    ]
+  },
+  "pois": [
+    {
+      "id": "trailhead",
+      "type": "trailhead",
+      "name": "Trailhead",
+      "hoverText": "Trailhead",
+      "clickText": "Trailhead: This is the starting point of the trail through the conservation area.",
+      "lat": 44.624350,
+      "lng": -63.920500,
+      "audioSrc": "/audio/trailhead.mp3"
+    },
+    {
+      "id": "farmhouse",
+      "type": "farmhouse",
+      "name": "Farmhouse Foundation",
+      "hoverText": "Farmhouse Foundation",
+      "clickText": "Farmhouse Foundation: The remains of an early homestead that once supported local farming activity.",
+      "lat": 44.624050,
+      "lng": -63.920450,
+      "audioSrc": "/audio/farmhouse.mp3"
+    },
+    {
+      "id": "well1",
+      "type": "well",
+      "name": "Well",
+      "hoverText": "Well",
+      "clickText": "Well: One of the historic wells that supplied fresh water to the farmhouse.",
+      "lat": 44.623950,
+      "lng": -63.920750,
+      "audioSrc": "/audio/well1.mp3"
+    },
+    {
+      "id": "well2",
+      "type": "well",
+      "name": "Well",
+      "hoverText": "Well",
+      "clickText": "Well: A secondary well located near the rewilding edge.",
+      "lat": 44.624250,
+      "lng": -63.920750,
+      "audioSrc": "/audio/well2.mp3"
+    },
+    {
+      "id": "sitting",
+      "type": "sitting",
+      "name": "Sitting Area",
+      "hoverText": "Sitting Area",
+      "clickText": "Sitting Area: A quiet spot for rest, listening to birds, and observing the wetland.",
+      "lat": 44.623600,
+      "lng": -63.921000,
+      "audioSrc": "/audio/sitting.mp3"
+    },
+    {
+      "id": "yellow-birch",
+      "type": "yellow-birch",
+      "name": "Coastal Yellow Birch",
+      "hoverText": "Coastal Yellow Birch",
+      "clickText": "Coastal Yellow Birch: A regionally significant species adapted to the Nova Scotian coast.",
+      "lat": 44.624350,
+      "lng": -63.919650,
+      "audioSrc": "/audio/yellow-birch.mp3"
+    }
+    ]
+}
