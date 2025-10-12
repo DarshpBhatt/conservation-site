@@ -75,8 +75,8 @@ const Ecology = () => {
       .trim() + '.jpg';
     
     try {
-      // Dynamically import the image
-      return `/src/assets/ecologyimages/${filename}`;
+      // Import the image dynamically using Vite's import system
+      return new URL(`../assets/ecologyimages/${filename}`, import.meta.url).href;
     } catch (error) {
       console.log(`Image not found for: ${commonName}`);
       return null;
