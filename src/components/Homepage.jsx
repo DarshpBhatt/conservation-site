@@ -1,9 +1,9 @@
-// Authors: Lakshay Bansal (A00467478), Marko Ostrovitsa (A00448932)
-// Purpose: To display the Contact section of the Woodland Conservation website
+// Purpose: To display the Homepage (landing page) of the Woodland Conservation website
 import React from "react";
+import { Link } from "react-router-dom";
 import dayBackground from "../assets/forest1.png"; // Daytime forest image
 import nightBackground from "../assets/nightforest.png"; // Nighttime forest image
-import { FaTree, FaLeaf, FaSeedling, FaMapMarkedAlt } from "react-icons/fa";
+import { FaTree, FaLeaf, FaCamera, FaMapMarkedAlt } from "react-icons/fa";
 import { BsArrowRightCircle } from "react-icons/bs";
 
 const Homepage = ({ dark }) => {
@@ -38,42 +38,42 @@ const Homepage = ({ dark }) => {
           {/* Interactive Cards */}
           <div className="text-center bg-green-100/70 p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
             <FaTree className="text-green-600 text-5xl mx-auto mb-4" />
-            <h2 className="text-2xl font-semibold mb-4">Explore Nature</h2>
+            <h2 className="text-2xl font-semibold mb-4">Explore the Conservation Area</h2>
             <p className="text-lg">
               Discover trails, wildlife, and serene spots for relaxation.
             </p>
-            <button
+            <Link
+              to="/sitemap"
               className="text-green-600 hover:text-green-800 mt-4 inline-flex items-center"
-              onClick={() => alert("Nature Exploration Section Coming Soon!")}
             >
               Learn More <BsArrowRightCircle className="ml-2" />
-            </button>
+            </Link>
           </div>
           <div className="text-center bg-blue-100/70 p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
             <FaLeaf className="text-blue-600 text-5xl mx-auto mb-4" />
             <h2 className="text-2xl font-semibold mb-4">Conservation Education</h2>
             <p className="text-lg">
-              Attend workshops on sustainability and biodiversity.
+              Discover diverse wildlife across saltwater, freshwater, and terrestrial habitats.
             </p>
-            <button
+            <Link
+              to="/ecology"
               className="text-blue-600 hover:text-blue-800 mt-4 inline-flex items-center"
-              onClick={() => alert("Education Section Coming Soon!")}
             >
               Learn More <BsArrowRightCircle className="ml-2" />
-            </button>
+            </Link>
           </div>
           <div className="text-center bg-yellow-100/70 p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
-            <FaSeedling className="text-yellow-600 text-5xl mx-auto mb-4" />
-            <h2 className="text-2xl font-semibold mb-4">Volunteer & Support</h2>
+            <FaCamera className="text-yellow-600 text-5xl mx-auto mb-4" />
+            <h2 className="text-2xl font-semibold mb-4">Share & Explore Photos</h2>
             <p className="text-lg">
-              Join us in tree-planting events or contribute to our cause.
+              Explore user-uploaded photos and share your own experiences from the conservation area.
             </p>
-            <button
+            <Link
+              to="/gallery"
               className="text-yellow-600 hover:text-yellow-800 mt-4 inline-flex items-center"
-              onClick={() => alert("Volunteer Section Coming Soon!")}
             >
               Learn More <BsArrowRightCircle className="ml-2" />
-            </button>
+            </Link>
           </div>
         </div>
       </div>
@@ -117,38 +117,6 @@ const Homepage = ({ dark }) => {
         </div>
       </div>
 
-      {/* Interactive Map Section */}
-      <div className="bg-gray-900 text-white py-16 px-8">
-        <div className="text-center mb-6">
-          <FaMapMarkedAlt className="text-6xl mx-auto mb-4 text-green-400" />
-          <h2 className="text-4xl font-bold">Interactive Map</h2>
-          <p className="text-lg mt-2">
-            Plan your visit with our interactive site map. Explore trails,
-            picnic areas, and more.
-          </p>
-        </div>
-        <button
-          className="bg-green-500 hover:bg-green-400 text-white px-8 py-4 rounded-full shadow-lg font-semibold transition mx-auto block"
-          onClick={() => alert("Map Feature Coming Soon!")}
-        >
-          View Map
-        </button>
-      </div>
-
-      {/* Call-to-Action Section */}
-      <div className="bg-green-700 text-white py-16 px-8 text-center">
-        <h2 className="text-4xl font-bold mb-6">Become a Conservation Partner</h2>
-        <p className="text-lg max-w-3xl mx-auto mb-8">
-          Help us protect the environment. Become a member today and make a
-          difference.
-        </p>
-        <button
-          className="bg-white text-green-600 font-semibold px-8 py-4 rounded-full shadow-md hover:shadow-lg hover:bg-gray-200 transition"
-          onClick={() => alert("Membership Coming Soon!")}
-        >
-          Join Us
-        </button>
-      </div>
 
       {/* Footer */}
       <footer className="bg-gray-900 text-gray-300 py-8 text-center">

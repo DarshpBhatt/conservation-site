@@ -62,6 +62,62 @@ if (L?.Icon?.Default) {
   });
 }
 
+/* --------------- Custom Icons for POI Types using existing assets --------------- */
+const createCustomIcon = (type) => {
+  const iconConfigs = {
+    trailhead: { 
+      image: '/src/assets/hiking.png',
+      color: '#10b981' 
+    },
+    farmhouse: { 
+      image: '/src/assets/farm.png',
+      color: '#8b5cf6' 
+    },
+    well: { 
+      image: '/src/assets/water-well.png',
+      color: '#3b82f6' 
+    },
+    sitting: { 
+      image: '/src/assets/sitting.png',
+      color: '#f59e0b' 
+    },
+    'yellow-birch': { 
+      image: '/src/assets/birch.png',
+      color: '#84cc16' 
+    },
+  };
+  
+  const config = iconConfigs[type] || { 
+    image: '/src/assets/forest1.png', 
+    color: '#ef4444' 
+  };
+  
+  return L.divIcon({
+    className: 'custom-div-icon',
+    html: `<div style="
+      background-color: ${config.color};
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 3px solid white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+      overflow: hidden;
+    ">
+      <img src="${config.image}" alt="${type}" style="
+        width: 24px;
+        height: 24px;
+        object-fit: cover;
+        border-radius: 50%;
+      " />
+    </div>`,
+    iconSize: [32, 32],
+    iconAnchor: [16, 16],
+  });
+};
+
 /* --------------- Disable Interactions --------------- */
 function DisableInteractions() {
   const map = useMapEvents({});
@@ -95,10 +151,15 @@ function sanitizePolygonCoords(poly) {
 }
 
 export default function Sitemap() {
+  /* ------- Debug logging ------- */
+  console.log("Sitemap: mapData loaded:", !!mapData);
+  console.log("Sitemap: mapData structure:", mapData ? Object.keys(mapData) : "No data");
+
   /* ------- Map data with strong guards ------- */
   const siteBorder = useMemo(() => {
-    const raw = mapData?.siteBorder || mapData?.border || [];
+    const raw = mapData?.areas?.siteBorder || mapData?.siteBorder || mapData?.border || [];
     const cleaned = sanitizePolygonCoords(raw);
+    console.log("Sitemap: siteBorder coords:", cleaned.length);
     if (!cleaned.length && raw?.length) {
       console.warn("siteBorder provided but contained no valid [lat,lng] pairs.");
     }
@@ -106,15 +167,17 @@ export default function Sitemap() {
   }, []);
 
   const areas = useMemo(() => {
-    const rawAreas = Array.isArray(mapData?.areas) ? mapData.areas : [];
-    return rawAreas
-      .map((a) => ({
-        id: a?.id ?? a?.name ?? Math.random().toString(36).slice(2),
-        name: a?.name ?? "Area",
-        color: a?.color ?? "#16a34a",
-        coords: sanitizePolygonCoords(a?.coords || []),
-      }))
-      .filter((a) => a.coords.length > 0);
+    const rawAreas = mapData?.areas || {};
+    const areaEntries = Object.entries(rawAreas).filter(([key, value]) => 
+      key !== 'siteBorder' && Array.isArray(value)
+    );
+    
+    return areaEntries.map(([key, coords]) => ({
+      id: key,
+      name: key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase()),
+      color: "#16a34a",
+      coords: sanitizePolygonCoords(coords),
+    })).filter((a) => a.coords.length > 0);
   }, []);
 
   const pois = useMemo(() => {
@@ -260,10 +323,10 @@ export default function Sitemap() {
   /* ------- Render ------- */
   return (
     <ErrorBoundary>
-      <div className="relative" style={{ minHeight: "80vh" }}>
+      <div className="relative w-full" style={{ minHeight: "80vh" }}>
         {/* North arrow from /public/images */}
         <img
-          src="/images/north-arrow.jpeg"
+          src="/images/north-arrow.jpg"
           alt="North arrow"
           style={{
             position: "absolute",
@@ -273,7 +336,7 @@ export default function Sitemap() {
             opacity: 0.9,
             pointerEvents: "none",
             userSelect: "none",
-            zIndex: 1000,
+            zIndex: 10,
           }}
         />
 
@@ -283,7 +346,7 @@ export default function Sitemap() {
             position: "absolute",
             left: 8,
             top: 8,
-            zIndex: 1000,
+            zIndex: 10,
             display: "flex",
             gap: 8,
           }}
@@ -319,7 +382,7 @@ export default function Sitemap() {
               position: "absolute",
               left: 8,
               top: 56,
-              zIndex: 1000,
+              zIndex: 10,
               background: "rgba(255,255,255,0.9)",
               color: "#111",
               padding: 8,
@@ -334,7 +397,7 @@ export default function Sitemap() {
         <MapContainer
           center={center}
           zoom={16}
-          style={{ height: "80vh", width: "100%" }}
+          style={{ height: "80vh", width: "100%", zIndex: 1 }}
           zoomControl={false}
           dragging={false}
           scrollWheelZoom={false}
@@ -369,13 +432,24 @@ export default function Sitemap() {
 
           {/* POIs */}
           {pois.map((p) => (
-            <Marker key={p.id || `${p.lat},${p.lng}`} position={[p.lat, p.lng]}>
+            <Marker 
+              key={p.id || `${p.lat},${p.lng}`} 
+              position={[p.lat, p.lng]}
+              icon={createCustomIcon(p.type)}
+            >
               <Popup>
-                <div>
-                  <div style={{ fontWeight: 600 }}>{p.name}</div>
-                  {p.description && (
-                    <div style={{ fontSize: 12, color: "#444" }}>
-                      {p.description}
+                <div style={{ minWidth: '150px' }}>
+                  <div style={{ fontWeight: 600, marginBottom: '8px', fontSize: '14px' }}>
+                    {p.name}
+                  </div>
+                  {p.clickText && (
+                    <div style={{ fontSize: 12, color: "#666", lineHeight: '1.4' }}>
+                      {p.clickText}
+                    </div>
+                  )}
+                  {p.audioSrc && (
+                    <div style={{ marginTop: '8px', fontSize: 11, color: "#888" }}>
+                      🔊 Audio available
                     </div>
                   )}
                 </div>
@@ -405,7 +479,7 @@ export default function Sitemap() {
             left: 0,
             right: 0,
             bottom: 16,
-            zIndex: 1000,
+            zIndex: 10,
             display: "flex",
             justifyContent: "center",
             pointerEvents: "none",

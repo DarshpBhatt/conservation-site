@@ -1,9 +1,8 @@
-// Author: Bhanu Prakash (A00468530)
-// Purpose: To use the api, but not able to figure out the distance calaculations.
+// Purpose: LocationLookup component for searching and displaying locations using Google Maps API
 
 import React, { useState } from 'react';
 
-const SiteMap = () => {
+const LocationLookup = () => {
   const [location, setLocation] = useState('44.6488,-63.5752'); // Default to Halifax, NS
   const [address, setAddress] = useState('');
   const [error, setError] = useState(null);
@@ -65,4 +64,4 @@ const SiteMap = () => {
   );
 };
 
-export default SiteMap;
+export default LocationLookup;

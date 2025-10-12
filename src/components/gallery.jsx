@@ -1,5 +1,4 @@
-// Author: Kunal Singla(A00461346)
-// Purpose: This file represents the gallery component. 
+// Purpose: To display the Gallery page with user-uploaded photos and image upload functionality 
 
 import React, { useState } from 'react';
 

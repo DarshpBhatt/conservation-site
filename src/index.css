@@ -1,6 +1,11 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+html, body {
+  overflow-x: hidden; /* Prevent horizontal scroll */
+}
+
 body {
   font-family: 'Calibri', sans-serif;
   line-height: 1.5;

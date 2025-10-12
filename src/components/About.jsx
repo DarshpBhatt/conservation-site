@@ -1,5 +1,4 @@
-// Author: Lakshay Bansal (A00467478)
-// Prupose: This file represents an about component.  
+// Purpose: To display the About page of the Woodland Conservation website with site information and mission statement  
 
 import React, { useRef, useState, useEffect } from "react";
 import outlookImage from "../assets/outlook.jpg"; 

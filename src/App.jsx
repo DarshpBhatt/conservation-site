@@ -1,5 +1,4 @@
-//Author: Marko Ostrovitsa(A00448932)
-//Purpose of the file is to diplay all the components together in the website
+// Purpose: Main App component that handles routing and displays all components together in the website
 
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
@@ -9,7 +8,7 @@ import About from './components/About';
 import SiteMap from './components/Sitemap';
 import Contact from './components/Contact'; // Importing Contact component
 import Gallery from './components/gallery';
-import Flora from './components/flora';
+import Ecology from './components/Ecology';
 
 // App component definition
 function App() {
@@ -35,7 +34,7 @@ function App() {
           <Route path="/sitemap" element={<SiteMap />} /> {/* Route for SiteMap component */}
           <Route path="/contact" element={<Contact />} /> {/* Route for Contact component */}
           <Route path="/gallery" element={<Gallery />}/>
-          <Route path="/flora" element={<Flora />}/>
+          <Route path="/ecology" element={<Ecology />}/>
         </Routes>
       </div>
     </Router>
