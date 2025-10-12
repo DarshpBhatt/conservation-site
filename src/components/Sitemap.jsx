@@ -26,6 +26,14 @@ import {
   getClosestPoiWithinRadius,
 } from "../utils/geo";
 
+// Import marker images
+import hikingIcon from "../assets/hiking.png";
+import farmIcon from "../assets/farm.png";
+import wellIcon from "../assets/water-well.png";
+import sittingIcon from "../assets/sitting.png";
+import birchIcon from "../assets/birch.png";
+import forestIcon from "../assets/forest1.png";
+
 /* ---------------- Error Boundary ---------------- */
 class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -66,29 +74,29 @@ if (L?.Icon?.Default) {
 const createCustomIcon = (type) => {
   const iconConfigs = {
     trailhead: { 
-      image: '/src/assets/hiking.png',
+      image: hikingIcon,
       color: '#10b981' 
     },
     farmhouse: { 
-      image: '/src/assets/farm.png',
+      image: farmIcon,
       color: '#8b5cf6' 
     },
     well: { 
-      image: '/src/assets/water-well.png',
+      image: wellIcon,
       color: '#3b82f6' 
     },
     sitting: { 
-      image: '/src/assets/sitting.png',
+      image: sittingIcon,
       color: '#f59e0b' 
     },
     'yellow-birch': { 
-      image: '/src/assets/birch.png',
+      image: birchIcon,
       color: '#84cc16' 
     },
   };
   
   const config = iconConfigs[type] || { 
-    image: '/src/assets/forest1.png', 
+    image: forestIcon, 
     color: '#ef4444' 
   };
   
