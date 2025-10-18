@@ -20,7 +20,7 @@ jobs:
           submodules: true
           lfs: false
 
-      # Force Node 20 (Vite requires 20.19+)
+      #Force Node 20 (Vite requires 20.19+)
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
