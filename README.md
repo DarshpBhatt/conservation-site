@@ -75,10 +75,14 @@ https://purple-field-0f81f6c10.3.azurestaticapps.net
 
 ## Environment Variables
 
-The weather widget depends on the OpenWeather API. Create a `.env.local` file in the project root (or configure the variable through your hosting provider) with the following entry:
+The weather widget depends on the OpenWeather API.
+
+- A working public key is already provided (OpenWeather API key: `bd5e378503939ddaee76f12ad7a97608`) and bundled into `.env.example` plus `netlify.toml` so preview deployments stay functional.
+- For local work, copy `.env.example` to `.env.local` and adjust the key if you prefer to use your own credentials:
 
 ```
-VITE_OPENWEATHER_API_KEY=<your-openweather-api-key>
+cp .env.example .env.local
 ```
 
-Restart the dev server after creating or updating the file so Vite can pick up the new value.
+- When running locally with Vite, restart the dev server after creating or updating the file so it can pick up the new value.
+- On Netlify (or any other host), define `VITE_OPENWEATHER_API_KEY` in the environment settings to override the default.
