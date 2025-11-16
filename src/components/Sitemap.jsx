@@ -698,16 +698,16 @@ export default function Sitemap({ dark = false }) {
           />
 
           {/* Site border */}
-          {viewMode === VIEW_MODES.OVERVIEW && siteBorder.length > 0 && (
-            <Polygon
-              positions={siteBorder}
-              pathOptions={{ color: "#111", weight: 3, fillOpacity: 0 }}
-            >
-              <Tooltip sticky direction="top">
-                Woodland Site Border
-              </Tooltip>
-            </Polygon>
-          )}
+            {viewMode === VIEW_MODES.OVERVIEW && siteBorder.length > 1 && (
+              <Polyline
+                positions={[...siteBorder, siteBorder[0]]}
+                pathOptions={{ color: "#111", weight: 3, opacity: 1 }}
+              >
+                <Tooltip sticky direction="top">
+                  Woodland Site Border
+                </Tooltip>
+              </Polyline>
+            )}
 
           {/* Areas */}
           {viewMode === VIEW_MODES.OVERVIEW &&
