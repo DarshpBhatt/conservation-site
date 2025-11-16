@@ -69,7 +69,7 @@ function App() {
               <Route path="/gallery" element={<GlassPage><Gallery /></GlassPage>} />
               <Route path="/ecology" element={<GlassPage><Ecology /></GlassPage>} />
               <Route path="/contact" element={<GlassPage><Contact /></GlassPage>} />
-              <Route path="/sitemap" element={<FullBleedGlass><SiteMap /></FullBleedGlass>} />
+                <Route path="/sitemap" element={<FullBleedGlass><SiteMap dark={dark} /></FullBleedGlass>} />
               <Route path="/natural-burial" element={<GlassPage><NaturalBurial /></GlassPage>} />
               <Route path="/shop" element={<GlassPage><Shop /></GlassPage>} />
             </Routes>
