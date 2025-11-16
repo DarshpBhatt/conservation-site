@@ -16,13 +16,13 @@ import darkModeBackdrop from "./assets/globalimages/darkmode.jpg";
 
 // App component definition
 const GlassPage = ({ children }) => (
-  <section className="mx-auto w-full max-w-7xl rounded-3xl border border-white/40 bg-white/40 p-8 shadow-xl shadow-slate-900/12 backdrop-blur-2xl backdrop-saturate-150 transition duration-500 dark:border-slate-700/60 dark:bg-slate-900/55">
+  <section className="mx-auto w-full max-w-7xl rounded-[32px] border border-white/40 bg-white/40 p-8 shadow-lg shadow-slate-900/10 backdrop-blur-2xl backdrop-saturate-150 transition duration-500 dark:border-slate-500/40 dark:bg-slate-900/40 dark:shadow-black/30">
     {children}
   </section>
 );
 
 const FullBleedGlass = ({ children }) => (
-  <section className="mx-auto w-full max-w-7xl overflow-hidden rounded-3xl border border-white/35 bg-white/30 shadow-xl shadow-slate-900/20 backdrop-blur-2xl backdrop-saturate-150 transition duration-500 dark:border-slate-700/60 dark:bg-slate-900/45">
+  <section className="mx-auto w-full max-w-7xl overflow-hidden rounded-[32px] border border-white/40 bg-white/40 shadow-lg shadow-slate-900/10 backdrop-blur-2xl backdrop-saturate-150 transition duration-500 dark:border-slate-500/40 dark:bg-slate-900/40 dark:shadow-black/30">
     {children}
   </section>
 );
