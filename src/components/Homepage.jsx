@@ -1,13 +1,10 @@
 // Purpose: To display the Homepage (landing page) of the Woodland Conservation website
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import bannerImage from "../assets/homepage-banner.jpg";
 import { Link } from "react-router-dom";
 import { FaTree, FaCamera, FaMapMarkedAlt } from "react-icons/fa";
 import { BsArrowRightCircle, BsArrowUpRight } from "react-icons/bs";
-import { IoVolumeHigh, IoVolumeOff } from "react-icons/io5";
 import Footer from "./Footer";
-import ttsData from "../data/tts.json";
-import { speakText, stopSpeech } from "../utils/azureTTS";
 
 const glassPanel =
   "rounded-3xl border border-white/40 bg-white/60 p-6 shadow-lg shadow-slate-900/10 backdrop-blur-2xl transition-colors duration-300 dark:border-slate-700/60 dark:bg-slate-900/55";
@@ -37,48 +34,15 @@ const coreTiles = [
 ];
 
 const Homepage = () => {
-  const [isPlaying, setIsPlaying] = useState(false);
-  const synthRef = useRef(null);
-
-  useEffect(() => {
-    return () => {
-      if (synthRef.current) {
-        stopSpeech(synthRef.current);
-        synthRef.current = null;
-      }
-    };
-  }, []);
-
-  const handleTextToSpeech = () => {
-    if (isPlaying && synthRef.current) {
-      stopSpeech(synthRef.current);
-      synthRef.current = null;
-      setIsPlaying(false);
-    } else {
-      const text = ttsData.homepage || "Welcome to the St. Margaret's Bay Woodland Conservation Site.";
-      synthRef.current = speakText(
-        text,
-        () => {
-          synthRef.current = null;
-          setIsPlaying(false);
-        },
-        () => {
-          synthRef.current = null;
-          setIsPlaying(false);
-        }
-      );
-      setIsPlaying(true);
-    }
-  };
 
   return (
     <div className="flex flex-col gap-8 text-slate-800 dark:text-slate-100">
       <header className={`${glassPanel} flex flex-col gap-5 md:flex-row md:items-center md:justify-between`}>
         <div className="flex-1 space-y-4">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-600 dark:text-emerald-300">
-            St. Margaret’s Bay Area Woodland
+            St. Margaret's Bay Area Woodland
           </p>
-          <h1 className="text-3xl font-semibold leading-tight sm:text-4xl">
+          <h1 className="text-2xl font-semibold md:text-3xl">
             A community forest that keeps local history and coastal birch standing strong.
           </h1>
           <p className="max-w-xl text-sm text-slate-600 dark:text-slate-300">
@@ -116,22 +80,6 @@ const Homepage = () => {
           </div>
         </div>
         <div className="flex items-center gap-4 md:flex-col">
-          <button
-            onClick={handleTextToSpeech}
-            className="flex items-center gap-2 rounded-full border border-white/60 bg-white/70 px-5 py-2 text-sm font-semibold text-emerald-700 shadow-md shadow-slate-900/10 hover:bg-white/90 dark:border-slate-600/60 dark:bg-slate-900/70 dark:text-emerald-200 transition-colors"
-          >
-            {isPlaying ? (
-              <>
-                <IoVolumeOff />
-                Stop
-              </>
-            ) : (
-              <>
-                <IoVolumeHigh />
-                Listen
-              </>
-            )}
-          </button>
           <figure className="mt-4 w-full overflow-hidden rounded-2xl border border-white/40 shadow-inner shadow-slate-900/10 dark:border-slate-700/60 md:mt-0 md:w-60 lg:w-72">
             <img src={bannerImage} alt="Trail canopy" className="h-full w-full object-cover" />
           </figure>

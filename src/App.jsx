@@ -10,6 +10,7 @@ import Contact from "./components/Contact";
 import Gallery from "./components/gallery";
 import Ecology from "./components/Ecology";
 import NaturalBurial from "./components/NaturalBurial";
+import Shop from "./components/Shop";
 import lightModeBackdrop from "./assets/globalimages/lightmode.jpg";
 import darkModeBackdrop from "./assets/globalimages/darkmode.jpg";
 
@@ -61,7 +62,7 @@ function App() {
 
         <div className="relative z-10 flex min-h-screen flex-col">
           <Navigation toggleDarkMode={darkModeHandler} dark={dark} />
-          <main className="flex flex-1 flex-col gap-8 px-4 pb-4 pt-36 sm:px-6 lg:px-12">
+          <main className="flex flex-1 flex-col gap-8 px-4 pb-4 pt-48 sm:px-6 lg:px-12 sm:pt-52 lg:pt-36">
             <Routes>
               <Route path="/" element={<GlassPage><Homepage dark={dark} /></GlassPage>} />
               <Route path="/about" element={<GlassPage><About /></GlassPage>} />
@@ -70,6 +71,7 @@ function App() {
               <Route path="/contact" element={<GlassPage><Contact /></GlassPage>} />
               <Route path="/sitemap" element={<FullBleedGlass><SiteMap /></FullBleedGlass>} />
               <Route path="/natural-burial" element={<GlassPage><NaturalBurial /></GlassPage>} />
+              <Route path="/shop" element={<GlassPage><Shop /></GlassPage>} />
             </Routes>
           </main>
         </div>

@@ -1,9 +1,6 @@
 // Purpose: To display the Gallery page with user-uploaded photos and image upload functionality 
 
 import React, { useState, useRef, useEffect } from 'react';
-import { IoVolumeHigh, IoVolumeOff } from 'react-icons/io5';
-import ttsData from '../data/tts.json';
-import { speakText, stopSpeech } from '../utils/azureTTS';
 import Footer from './Footer';
 
 const glassPanel =
@@ -21,39 +18,6 @@ import image8 from '../assets/download-11.jpg';
 import image9 from '../assets/images-1.jpg';
 
 const Gallery = () => {
-  const [isPlaying, setIsPlaying] = useState(false);
-  const synthRef = useRef(null);
-
-  useEffect(() => {
-    return () => {
-      if (synthRef.current) {
-        stopSpeech(synthRef.current);
-        synthRef.current = null;
-      }
-    };
-  }, []);
-
-  const handleTextToSpeech = () => {
-    if (isPlaying && synthRef.current) {
-      stopSpeech(synthRef.current);
-      synthRef.current = null;
-      setIsPlaying(false);
-    } else {
-      const text = ttsData.gallery || "Explore our photo gallery to see the beauty of the Woodland Conservation Site.";
-      synthRef.current = speakText(
-        text,
-        () => {
-          synthRef.current = null;
-          setIsPlaying(false);
-        },
-        () => {
-          synthRef.current = null;
-          setIsPlaying(false);
-        }
-      );
-      setIsPlaying(true);
-    }
-  };
 
   const [images, setImages] = useState([
     { src: image1, name: 'Image 1' },
@@ -97,22 +61,6 @@ const Gallery = () => {
             Discover the breathtaking beauty of forests and serene landscapes. Feel free to add your favorite photos to enrich this gallery!
           </p>
         </div>
-        <button
-          onClick={handleTextToSpeech}
-          className="flex items-center gap-2 rounded-full border border-white/60 bg-white/70 px-5 py-2 text-sm font-semibold text-emerald-700 shadow-md shadow-slate-900/10 hover:bg-white dark:border-slate-600/60 dark:bg-slate-900/70 dark:text-emerald-200 transition-colors"
-        >
-          {isPlaying ? (
-            <>
-              <IoVolumeOff />
-              Stop
-            </>
-          ) : (
-            <>
-              <IoVolumeHigh />
-              Listen
-            </>
-          )}
-        </button>
       </header>
 
       {/* Gallery Grid */}

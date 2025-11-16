@@ -2,9 +2,6 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { IoVolumeHigh, IoVolumeOff } from "react-icons/io5";
-import ttsData from "../data/tts.json";
-import { speakText, stopSpeech } from "../utils/azureTTS";
 import lakeshoreImage from "../assets/about/brinelakelookout.jpg";
 import exerciseImage from "../assets/about/exercise.jpg";
 import labyrinthImage from "../assets/about/labrynth.jpg";
@@ -113,39 +110,6 @@ const photoStories = [
 ];
 
 export default function About() {
-  const [isPlaying, setIsPlaying] = useState(false);
-  const synthRef = useRef(null);
-
-  useEffect(() => {
-    return () => {
-      if (synthRef.current) {
-        stopSpeech(synthRef.current);
-        synthRef.current = null;
-      }
-    };
-  }, []);
-
-  const handleTextToSpeech = () => {
-    if (isPlaying && synthRef.current) {
-      stopSpeech(synthRef.current);
-      synthRef.current = null;
-      setIsPlaying(false);
-    } else {
-      const text = ttsData.about || "The St. Margaret's Bay Woodland Conservation Site is a protected forest in Nova Scotia.";
-      synthRef.current = speakText(
-        text,
-        () => {
-          synthRef.current = null;
-          setIsPlaying(false);
-        },
-        () => {
-          synthRef.current = null;
-          setIsPlaying(false);
-        }
-      );
-      setIsPlaying(true);
-    }
-  };
 
   return (
     <div className="flex flex-col gap-8 text-slate-800 dark:text-slate-100">
@@ -154,8 +118,8 @@ export default function About() {
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-600 dark:text-emerald-300">
             About the Conservation Woodland
           </p>
-          <h1 className="text-3xl font-semibold leading-tight sm:text-4xl">
-            French Village Conservation Woodland is the forest family behind St. Paul’s Church.
+          <h1 className="text-2xl font-semibold md:text-3xl">
+            French Village Conservation Woodland is the forest family behind St. Paul's Church.
           </h1>
           <p className="text-sm text-slate-600 dark:text-slate-300">
             Step off St. Paul’s Lane and you’re instantly on land gifted by St. Paul’s Anglican Church for the whole community. The 27 acres stretch almost two kilometres from the heritage churchyard to Brine Lake with wetlands, yellow birch groves, and trail stops that invite curious visitors and lifelong nature lovers alike.
@@ -194,25 +158,25 @@ export default function About() {
               Contact
               <BsArrowUpRight />
             </Link>
+            <button
+              onClick={handleTextToSpeech}
+              className="flex items-center gap-2 rounded-full border border-white/60 bg-white/70 px-5 py-2 text-xs font-semibold text-emerald-700 shadow-md shadow-slate-900/10 hover:bg-white/90 dark:border-slate-600/60 dark:bg-slate-900/70 dark:text-emerald-200 transition-colors"
+            >
+              {isPlaying ? (
+                <>
+                  <IoVolumeOff />
+                  Stop
+                </>
+              ) : (
+                <>
+                  <IoVolumeHigh />
+                  Listen
+                </>
+              )}
+            </button>
           </div>
         </div>
         <div className="flex items-center gap-4 lg:flex-col">
-          <button
-            onClick={handleTextToSpeech}
-            className="flex items-center gap-2 rounded-full border border-white/60 bg-white/70 px-5 py-2 text-sm font-semibold text-emerald-700 shadow-md shadow-slate-900/10 hover:bg-white/90 dark:border-slate-600/60 dark:bg-slate-900/70 dark:text-emerald-200 transition-colors"
-          >
-            {isPlaying ? (
-              <>
-                <IoVolumeOff />
-                Stop
-              </>
-            ) : (
-              <>
-                <IoVolumeHigh />
-                Listen
-              </>
-            )}
-          </button>
           <figure className="mt-6 w-full overflow-hidden rounded-3xl border border-white/40 shadow-inner shadow-slate-900/10 transition hover:-translate-y-1 hover:shadow-xl hover:shadow-emerald-500/10 dark:border-slate-700/60 sm:mx-auto md:mt-8 lg:mt-0 lg:w-[28rem] xl:w-[32rem]">
             <img src={churchSketchImage} alt="Historic sketch of St. Paul's Anglican Church" className="h-full w-full object-cover" />
           </figure>
