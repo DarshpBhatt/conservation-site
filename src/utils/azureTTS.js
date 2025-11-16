@@ -1,97 +1,63 @@
-// Purpose: Azure TTS utility for consistent text-to-speech across the site
+// Azure TTS - with strict locking
 
 import * as SpeechSDK from "microsoft-cognitiveservices-speech-sdk";
+import { setActiveSynthesizer, unlockTTS, isPlayingTTS } from "./ttsManager";
 
 const AZURE_KEY = import.meta.env.VITE_AZURE_SPEECH_KEY;
 const AZURE_REGION = import.meta.env.VITE_AZURE_REGION;
 
-// Debug logging
-console.log("Azure TTS Config:", {
-  hasKey: !!AZURE_KEY,
-  hasRegion: !!AZURE_REGION,
-  keyLength: AZURE_KEY?.length,
-  region: AZURE_REGION
-});
-
 export const createSpeechSynthesizer = () => {
   if (!AZURE_KEY || !AZURE_REGION) {
-    console.error("Azure Speech credentials not configured", {
-      hasKey: !!AZURE_KEY,
-      hasRegion: !!AZURE_REGION
-    });
-    return null;
-  }
-
-  if (!SpeechSDK || !SpeechSDK.SpeechConfig) {
-    console.error("Azure Speech SDK not loaded", { SpeechSDK: !!SpeechSDK });
+    console.error("Azure credentials missing");
     return null;
   }
 
   try {
-    const speechConfig = SpeechSDK.SpeechConfig.fromSubscription(
-      AZURE_KEY,
-      AZURE_REGION
-    );
-    speechConfig.speechSynthesisVoiceName = "en-US-AvaNeural"; // calm, soft tone
-    speechConfig.speechSynthesisOutputFormat =
-      SpeechSDK.SpeechSynthesisOutputFormat.Audio16Khz32KBitRateMonoMp3;
-
-    // Slower speech
-    speechConfig.setProperty(
-      SpeechSDK.PropertyId.SpeechServiceResponse_RequestSentenceBoundary,
-      "true"
-    );
-    speechConfig.setProperty(
-      SpeechSDK.PropertyId.SpeechServiceResponse_SynthesisVoiceRate,
-      "-10%"
-    );
-
-    // Create audio config for browser playback
+    const config = SpeechSDK.SpeechConfig.fromSubscription(AZURE_KEY, AZURE_REGION);
+    config.speechSynthesisVoiceName = "en-US-AvaNeural";
     const audioConfig = SpeechSDK.AudioConfig.fromDefaultSpeakerOutput();
-    
-    const synthesizer = new SpeechSDK.SpeechSynthesizer(speechConfig, audioConfig);
-    console.log("Speech synthesizer created successfully");
-    return synthesizer;
+    return new SpeechSDK.SpeechSynthesizer(config, audioConfig);
   } catch (error) {
-    console.error("Error creating speech synthesizer:", error);
+    console.error("Error creating synthesizer:", error);
     return null;
   }
 };
 
+// NOTE: Lock should already be set BEFORE calling this function
 export const speakText = (text, onEnd, onError) => {
-  console.log("speakText called with:", { textLength: text?.length, hasText: !!text });
-  
-  if (!text || text.trim().length === 0) {
-    console.warn("Empty text provided to speakText");
-    if (onError) onError(new Error("Empty text"));
+  // Double-check lock (should already be set by caller)
+  if (!isPlayingTTS()) {
+    console.error("TTS not locked before speakText call");
+    if (onError) onError(new Error("TTS not locked"));
     return null;
   }
 
   const synth = createSpeechSynthesizer();
   if (!synth) {
-    console.error("Failed to create speech synthesizer");
-    if (onError) onError(new Error("Speech synthesizer not available"));
+    unlockTTS();
+    if (onError) onError(new Error("Synthesizer failed"));
     return null;
   }
 
-  console.log("Starting speech synthesis...");
+  setActiveSynthesizer(synth);
+
+  const escaped = text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
   
-  synth.speakTextAsync(
-    text,
-    (result) => {
-      console.log("Speech synthesis completed", result);
-      if (result.reason === SpeechSDK.ResultReason.SynthesizingAudioCompleted) {
-        console.log("Speech synthesized successfully");
-      } else if (result.reason === SpeechSDK.ResultReason.Canceled) {
-        const cancellation = SpeechSDK.CancellationDetails.fromResult(result);
-        console.error("Speech synthesis canceled:", cancellation.reason, cancellation.errorDetails);
-      }
-      synth.close();
+  const ssml = `<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xml:lang="en-US"><voice name="en-US-AvaNeural"><prosody rate="-10%">${escaped}</prosody></voice></speak>`;
+
+  synth.speakSsmlAsync(
+    ssml,
+    () => {
+      unlockTTS();
+      try { synth.close(); } catch (e) {}
       if (onEnd) onEnd();
     },
     (err) => {
-      console.error("Speech synthesis error:", err);
-      synth.close();
+      unlockTTS();
+      try { synth.close(); } catch (e) {}
       if (onError) onError(err);
     }
   );
@@ -99,22 +65,5 @@ export const speakText = (text, onEnd, onError) => {
   return synth;
 };
 
-export const stopSpeech = (synth) => {
-  if (synth) {
-    try {
-      synth.stopSpeakingAsync(
-        () => {
-          synth.close();
-        },
-        (err) => {
-          console.warn("Error stopping speech:", err);
-          synth.close();
-        }
-      );
-    } catch (error) {
-      console.error("Error stopping speech:", error);
-      synth.close();
-    }
-  }
-};
-
+export { isPlayingTTS };
+export { stopActiveSynthesizer } from "./ttsManager";

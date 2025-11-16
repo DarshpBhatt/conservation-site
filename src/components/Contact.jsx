@@ -3,52 +3,17 @@
 import React, { useState, useRef, useEffect } from "react";
 import { FaPhone, FaEnvelope, FaMapMarkerAlt, FaFacebook, FaInstagram } from "react-icons/fa";
 import { FaXTwitter } from "react-icons/fa6";
-import { IoVolumeHigh, IoVolumeOff } from "react-icons/io5";
 import Footer from "./Footer";
-import ttsData from "../data/tts.json";
-import { speakText, stopSpeech } from "../utils/azureTTS";
 
 const Contact = () => {
-  const [isPlaying, setIsPlaying] = useState(false);
-  const synthRef = useRef(null);
-
-  useEffect(() => {
-    return () => {
-      if (synthRef.current) {
-        stopSpeech(synthRef.current);
-        synthRef.current = null;
-      }
-    };
-  }, []);
-
-  const handleTextToSpeech = () => {
-    if (isPlaying && synthRef.current) {
-      stopSpeech(synthRef.current);
-      synthRef.current = null;
-      setIsPlaying(false);
-    } else {
-      const text = ttsData.contact || "We would love to hear from you. Use the contact form or reach out through our social channels.";
-      synthRef.current = speakText(
-        text,
-        () => {
-          synthRef.current = null;
-          setIsPlaying(false);
-        },
-        () => {
-          synthRef.current = null;
-          setIsPlaying(false);
-        }
-      );
-      setIsPlaying(true);
-    }
-  };
+  const [contactReason, setContactReason] = useState("");
 
   const glassPanel =
-    "rounded-3xl border border-white/35 bg-white/55 shadow-lg shadow-slate-900/12 backdrop-blur-2xl transition-colors duration-300 dark:border-slate-700/60 dark:bg-slate-900/55";
+    "rounded-3xl border border-white/40 bg-white/60 p-6 shadow-lg shadow-slate-900/10 backdrop-blur-2xl transition-colors duration-300 dark:border-slate-700/60 dark:bg-slate-900/55";
 
   return (
     <div className="flex flex-col gap-8 text-slate-800 dark:text-slate-100">
-      <header className={`${glassPanel} flex flex-col gap-5 p-6 md:flex-row md:items-center md:justify-between`}>
+      <header className={`${glassPanel} flex flex-col gap-5 md:flex-row md:items-center md:justify-between`}>
         <div>
           <h1 className="text-2xl font-semibold md:text-3xl">Get in touch</h1>
           <p className="mt-2 max-w-2xl text-sm text-slate-600 dark:text-slate-300">
@@ -107,6 +72,26 @@ const Contact = () => {
           </div>
 
           <div className="space-y-2">
+            <label htmlFor="reason" className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-300">
+              Reason for Contact
+            </label>
+            <select
+              id="reason"
+              value={contactReason}
+              onChange={(e) => setContactReason(e.target.value)}
+              className="w-full rounded-2xl border border-white/60 bg-white/80 px-4 py-3 text-sm shadow-inner shadow-slate-900/5 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-300 dark:border-slate-700/60 dark:bg-slate-900/70"
+            >
+              <option value="">Select a reason...</option>
+              <option value="volunteering">Volunteering / Trail Care</option>
+              <option value="natural-burial">Natural Burial Inquiries</option>
+              <option value="shop">Shop / Product Questions</option>
+              <option value="visit">Planning a Visit</option>
+              <option value="general">General Questions / Feedback</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+
+          <div className="space-y-2">
             <label htmlFor="message" className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-300">
               Message
             </label>
@@ -119,8 +104,12 @@ const Contact = () => {
           </div>
 
           <button
-            type="submit"
+            type="button"
             className="w-full rounded-full border border-emerald-500 bg-emerald-500/90 py-3 text-sm font-semibold text-white shadow-lg shadow-emerald-500/30 transition hover:bg-emerald-500"
+            onClick={(e) => {
+              e.preventDefault();
+              alert("Thank you for your message. We'll get back to you soon!");
+            }}
           >
             Send
           </button>
@@ -129,7 +118,7 @@ const Contact = () => {
 
       <section className={`${glassPanel} grid gap-6 p-6 md:grid-cols-2`}>
         <div>
-          <h2 className="text-xl font-semibold">Direct contacts</h2>
+          <h2 className="text-2xl font-semibold">Direct contacts</h2>
           <div className="mt-4 space-y-3 text-sm text-slate-600 dark:text-slate-300">
             <div className="flex items-center gap-3">
               <FaPhone className="text-emerald-500" />
@@ -146,7 +135,7 @@ const Contact = () => {
           </div>
         </div>
         <div>
-          <h2 className="text-xl font-semibold">Follow us</h2>
+          <h2 className="text-2xl font-semibold">Follow us</h2>
           <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">
             Join our community online for event updates, volunteer days, and trail highlights.
           </p>

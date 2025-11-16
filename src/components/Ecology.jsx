@@ -3,10 +3,7 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import ecologyData from '../data/ecologydata.json';
-import { IoVolumeHigh, IoVolumeOff } from 'react-icons/io5';
 import Footer from "./Footer";
-import ttsData from '../data/tts.json';
-import { speakText, stopSpeech } from '../utils/azureTTS';
 
 const imageModules = import.meta.glob('../assets/ecologyimages/*', {
   eager: true,
@@ -79,9 +76,7 @@ const getSpeciesImage = (commonName) => {
 const Ecology = () => {
   const [selectedItem, setSelectedItem] = useState(null);
   const [categoryFilter, setCategoryFilter] = useState('All');
-  const [isPlaying, setIsPlaying] = useState(false);
   const [isClient, setIsClient] = useState(false);
-  const synthRef = useRef(null);
   const scrollPositionRef = useRef(0);
 
   const categoryKeys = useMemo(() => Object.keys(ecologyData.species_by_category), []);
@@ -89,19 +84,6 @@ const Ecology = () => {
     () => ['All', ...categoryKeys.map(formatCategoryLabel)],
     [categoryKeys],
   );
-  const categoriesForSpeech = useMemo(
-    () => categoryKeys.map(formatCategoryLabel),
-    [categoryKeys],
-  );
-  const speechCategoryLine = useMemo(() => {
-    if (categoriesForSpeech.length === 0) return '';
-    if (categoriesForSpeech.length === 1) return categoriesForSpeech[0];
-    if (categoriesForSpeech.length === 2) {
-      return `${categoriesForSpeech[0]} and ${categoriesForSpeech[1]}`;
-    }
-    const last = categoriesForSpeech[categoriesForSpeech.length - 1];
-    return `${categoriesForSpeech.slice(0, -1).join(', ')}, and ${last}`;
-  }, [categoriesForSpeech]);
 
   const allSpecies = useMemo(() => buildSpeciesList(), []);
 
@@ -139,46 +121,15 @@ const Ecology = () => {
     }
   }, [selectedItem]);
 
-  useEffect(() => {
-    return () => {
-      if (synthRef.current) {
-        stopSpeech(synthRef.current);
-        synthRef.current = null;
-      }
-    };
-  }, []);
-
-  const handleTextToSpeech = () => {
-    if (isPlaying && synthRef.current) {
-      stopSpeech(synthRef.current);
-      synthRef.current = null;
-      setIsPlaying(false);
-    } else {
-      const text = ttsData.ecology || `Welcome to the Ecology Explorer! Discover the ${speechCategoryLine} of St. Margaret's Bay. Use the category filter to browse the photo collection and tap any card for a closer look.`;
-      synthRef.current = speakText(
-        text,
-        () => {
-          synthRef.current = null;
-          setIsPlaying(false);
-        },
-        () => {
-          synthRef.current = null;
-          setIsPlaying(false);
-        }
-      );
-      setIsPlaying(true);
-    }
-  };
-
   const closeModal = () => setSelectedItem(null);
 
   const glassPanel =
-    'rounded-3xl border border-white/35 bg-white/55 shadow-lg shadow-slate-900/12 backdrop-blur-2xl transition-colors duration-300 dark:border-slate-700/60 dark:bg-slate-900/55';
+    'rounded-3xl border border-white/40 bg-white/60 p-6 shadow-lg shadow-slate-900/10 backdrop-blur-2xl transition-colors duration-300 dark:border-slate-700/60 dark:bg-slate-900/55';
 
   return (
     <div className="flex flex-col gap-8 text-slate-800 dark:text-slate-100">
       <header
-        className={`${glassPanel} flex flex-col gap-5 p-6 md:flex-row md:items-center md:justify-between`}
+        className={`${glassPanel} flex flex-col gap-5 md:flex-row md:items-center md:justify-between`}
       >
         <div>
           <h1 className="text-2xl font-semibold md:text-3xl">Species you may encounter</h1>
@@ -187,22 +138,6 @@ const Ecology = () => {
             focus on a category, then open a card to view the reference photo.
           </p>
         </div>
-        <button
-          onClick={handleTextToSpeech}
-          className="flex items-center gap-2 rounded-full border border-white/60 bg-white/70 px-5 py-2 text-sm font-semibold text-emerald-700 shadow-md shadow-slate-900/10 hover:bg-white dark:border-slate-600/60 dark:bg-slate-900/70 dark:text-emerald-200"
-        >
-          {isPlaying ? (
-            <>
-              <IoVolumeOff />
-              Stop
-            </>
-          ) : (
-            <>
-              <IoVolumeHigh />
-              Listen
-            </>
-          )}
-        </button>
       </header>
 
       <section className={`${glassPanel} p-6`}>
@@ -356,7 +291,7 @@ const Ecology = () => {
                       )}
 
                       <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-t from-black/70 via-black/25 to-transparent text-center text-white drop-shadow-lg">
-                        <h2 id="ecology-modal-title" className="text-3xl font-semibold">
+                        <h2 id="ecology-modal-title" className="text-2xl font-semibold">
                           {selectedItem.common_name}
                         </h2>
                         <p className="mt-1 text-lg">{selectedItem.categoryLabel}</p>
