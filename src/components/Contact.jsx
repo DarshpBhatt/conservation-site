@@ -1,170 +1,175 @@
 // Purpose: To display the Contact section of the Woodland Conservation website
 
-import React, { useState, useEffect } from "react";
-import { FaPhone, FaEnvelope, FaMapMarkerAlt, FaFacebook, FaInstagram, FaTwitter } from "react-icons/fa";
-import { IoVolumeHigh } from "react-icons/io5";
+import React, { useState, useRef, useEffect } from "react";
+import { FaPhone, FaEnvelope, FaMapMarkerAlt, FaFacebook, FaInstagram } from "react-icons/fa";
+import { FaXTwitter } from "react-icons/fa6";
+import { IoVolumeHigh, IoVolumeOff } from "react-icons/io5";
+import Footer from "./Footer";
+import ttsData from "../data/tts.json";
+import { speakText, stopSpeech } from "../utils/azureTTS";
 
 const Contact = () => {
-  const [voices, setVoices] = useState([]);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const synthRef = useRef(null);
 
   useEffect(() => {
-    const loadVoices = () => {
-      const voicesList = window.speechSynthesis.getVoices();
-      setVoices(voicesList);
+    return () => {
+      if (synthRef.current) {
+        stopSpeech(synthRef.current);
+        synthRef.current = null;
+      }
     };
-
-    loadVoices();
-    window.speechSynthesis.onvoiceschanged = loadVoices;
   }, []);
 
-  const speakText = (text) => {
-    const utterance = new SpeechSynthesisUtterance(text);
-    
-    // Select a soft female voice
-    const selectedVoice = voices.find(voice => voice.name.includes("Female") && voice.lang === "en-US");
-    if (selectedVoice) {
-      utterance.voice = selectedVoice;
+  const handleTextToSpeech = () => {
+    if (isPlaying && synthRef.current) {
+      stopSpeech(synthRef.current);
+      synthRef.current = null;
+      setIsPlaying(false);
+    } else {
+      const text = ttsData.contact || "We would love to hear from you. Use the contact form or reach out through our social channels.";
+      synthRef.current = speakText(
+        text,
+        () => {
+          synthRef.current = null;
+          setIsPlaying(false);
+        },
+        () => {
+          synthRef.current = null;
+          setIsPlaying(false);
+        }
+      );
+      setIsPlaying(true);
     }
-    
-    // Adjust pitch and rate for a softer tone
-    utterance.pitch = 1.2; // Slightly higher pitch
-    utterance.rate = 0.9; // Slightly slower rate
-
-    window.speechSynthesis.speak(utterance);
   };
 
+  const glassPanel =
+    "rounded-3xl border border-white/35 bg-white/55 shadow-lg shadow-slate-900/12 backdrop-blur-2xl transition-colors duration-300 dark:border-slate-700/60 dark:bg-slate-900/55";
+
   return (
-    <div
-      id="contact"
-      className="p-8 bg-gradient-to-br from-green-300 to-green-500 dark:from-green-800 dark:to-green-900 text-gray-900 dark:text-gray-100 min-h-screen flex flex-col items-center"
-    >
-      {/* Section Title */}
-      <h1 className="text-5xl font-bold mb-6 text-center">Get in Touch</h1>
-      <p className="text-lg text-center mb-8 max-w-2xl">
-        Have questions, feedback, or just want to say hello? We'd love to hear from you! Fill out the form below or connect with us through our social channels.
-      </p>
+    <div className="flex flex-col gap-8 text-slate-800 dark:text-slate-100">
+      <header className={`${glassPanel} flex flex-col gap-5 p-6 md:flex-row md:items-center md:justify-between`}>
+        <div>
+          <h1 className="text-2xl font-semibold md:text-3xl">Get in touch</h1>
+          <p className="mt-2 max-w-2xl text-sm text-slate-600 dark:text-slate-300">
+            We would love to hear from you. Use the form below or connect with us through our social channels to share feedback, volunteer, or plan a visit.
+          </p>
+        </div>
+        <button
+          onClick={handleTextToSpeech}
+          className="flex items-center gap-2 rounded-full border border-white/60 bg-white/70 px-5 py-2 text-sm font-semibold text-emerald-700 shadow-md shadow-slate-900/10 hover:bg-white dark:border-slate-600/60 dark:bg-slate-900/70 dark:text-emerald-200 transition-colors"
+        >
+          {isPlaying ? (
+            <>
+              <IoVolumeOff />
+              Stop
+            </>
+          ) : (
+            <>
+              <IoVolumeHigh />
+              Listen
+            </>
+          )}
+        </button>
+      </header>
 
-      {/* Contact Form */}
-      <div className="bg-white dark:bg-darkerBlue rounded-lg shadow-lg p-6 md:p-10 max-w-4xl w-full">
-        <form>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-            {/* Name Input */}
-            <div>
-              <label htmlFor="name" className="block text-lg font-medium mb-2 flex items-center">
-                Name
-                <button
-                  onClick={() => speakText('Please enter a name')}
-                  className="ml-2 text-gray-900 dark:text-gray-100 focus:outline-none"
-                >
-                  <IoVolumeHigh className="text-2xl" />
-                </button>
-              </label>
-              <input
-                type="text"
-                id="name"
-                placeholder="Your Name"
-                className="w-full px-4 py-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-              />
-            </div>
-
-            {/* Email Input */}
-            <div>
-              <label htmlFor="email" className="block text-lg font-medium mb-2 flex items-center">
-                Email
-                <button
-                  onClick={() => speakText('Please enter an email')}
-                  className="ml-2 text-gray-900 dark:text-gray-100 focus:outline-none"
-                >
-                  <IoVolumeHigh className="text-2xl" />
-                </button>
-              </label>
-              <input
-                type="email"
-                id="email"
-                placeholder="Your Email"
-                className="w-full px-4 py-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-              />
-            </div>
+      <section className={`${glassPanel} p-6`}>
+        <form className="space-y-6">
+          <div className="grid gap-6 md:grid-cols-2">
+            {[
+              {
+                label: "Name",
+                id: "name",
+                type: "text",
+                placeholder: "Your name",
+                prompt: "Please enter a name",
+              },
+              {
+                label: "Email",
+                id: "email",
+                type: "email",
+                placeholder: "you@example.com",
+                prompt: "Please enter an email address",
+              },
+            ].map(({ label, id, type, placeholder, prompt }) => (
+              <div key={id} className="space-y-2">
+                <label htmlFor={id} className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-300">
+                  {label}
+                </label>
+                <input
+                  id={id}
+                  type={type}
+                  placeholder={placeholder}
+                  className="w-full rounded-2xl border border-white/60 bg-white/80 px-4 py-3 text-sm shadow-inner shadow-slate-900/5 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-300 dark:border-slate-700/60 dark:bg-slate-900/70"
+                />
+              </div>
+            ))}
           </div>
 
-          {/* Message Input */}
-          <div className="mb-6">
-            <label htmlFor="message" className="block text-lg font-medium mb-2 flex items-center">
+          <div className="space-y-2">
+            <label htmlFor="message" className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-300">
               Message
-              <button
-                onClick={() => speakText('Please enter a message')}
-                className="ml-2 text-gray-900 dark:text-gray-100 focus:outline-none"
-              >
-                <IoVolumeHigh className="text-2xl" />
-              </button>
             </label>
             <textarea
               id="message"
               rows="5"
-              placeholder="Your Message"
-              className="w-full px-4 py-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-            ></textarea>
+              placeholder="Share your thoughts or questions"
+              className="w-full rounded-2xl border border-white/60 bg-white/80 px-4 py-3 text-sm shadow-inner shadow-slate-900/5 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-300 dark:border-slate-700/60 dark:bg-slate-900/70"
+            />
           </div>
 
-          {/* Submit Button */}
           <button
             type="submit"
-            className="w-full bg-green-600 hover:bg-green-700 text-white text-lg font-bold py-3 px-6 rounded-md transition-all duration-300"
+            className="w-full rounded-full border border-emerald-500 bg-emerald-500/90 py-3 text-sm font-semibold text-white shadow-lg shadow-emerald-500/30 transition hover:bg-emerald-500"
           >
-            Send Message
+            Send
           </button>
         </form>
-      </div>
+      </section>
 
-      {/* Contact Information */}
-      <div className="mt-12 text-center">
-        <h2 className="text-3xl font-bold mb-4">Contact Information</h2>
-        <div className="flex flex-col md:flex-row justify-center items-center gap-6">
-          <div className="flex items-center gap-4">
-            <FaPhone className="text-2xl text-green-800 dark:text-green-400" />
-            <p className="text-lg">+1 (123) 456-7890</p>
-          </div>
-          <div className="flex items-center gap-4">
-            <FaEnvelope className="text-2xl text-green-800 dark:text-green-400" />
-            <p className="text-lg">info@woodlandconservation.ca</p>
-          </div>
-          <div className="flex items-center gap-4">
-            <FaMapMarkerAlt className="text-2xl text-green-800 dark:text-green-400" />
-            <p className="text-lg">Halifax, Nova Scotia</p>
+      <section className={`${glassPanel} grid gap-6 p-6 md:grid-cols-2`}>
+        <div>
+          <h2 className="text-xl font-semibold">Direct contacts</h2>
+          <div className="mt-4 space-y-3 text-sm text-slate-600 dark:text-slate-300">
+            <div className="flex items-center gap-3">
+              <FaPhone className="text-emerald-500" />
+              <span>+1 (123) 456-7890</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <FaEnvelope className="text-emerald-500" />
+              <span>info@woodlandconservation.ca</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <FaMapMarkerAlt className="text-emerald-500" />
+              <span>Halifax, Nova Scotia</span>
+            </div>
           </div>
         </div>
-      </div>
-
-      {/* Social Media Links */}
-      <div className="mt-8 text-center">
-        <h3 className="text-2xl font-bold mb-4">Follow Us</h3>
-        <div className="flex justify-center gap-6">
-          <a
-            href="https://facebook.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-green-800 dark:text-green-400 text-3xl hover:scale-110 transition-transform"
-          >
-            <FaFacebook />
-          </a>
-          <a
-            href="https://instagram.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-green-800 dark:text-green-400 text-3xl hover:scale-110 transition-transform"
-          >
-            <FaInstagram />
-          </a>
-          <a
-            href="https://twitter.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-green-800 dark:text-green-400 text-3xl hover:scale-110 transition-transform"
-          >
-            <FaTwitter />
-          </a>
+        <div>
+          <h2 className="text-xl font-semibold">Follow us</h2>
+          <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">
+            Join our community online for event updates, volunteer days, and trail highlights.
+          </p>
+          <div className="mt-4 flex gap-4">
+            {[
+              { icon: <FaFacebook />, href: "https://facebook.com" },
+              { icon: <FaInstagram />, href: "https://instagram.com" },
+              { icon: <FaXTwitter />, href: "https://twitter.com" },
+            ].map(({ icon, href }) => (
+              <a
+                key={href}
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex h-11 w-11 items-center justify-center rounded-2xl border border-white/50 bg-white/70 text-emerald-600 shadow-inner shadow-slate-900/5 transition hover:bg-white dark:border-slate-600/60 dark:bg-slate-900/60 dark:text-emerald-200"
+              >
+                {icon}
+              </a>
+            ))}
+          </div>
         </div>
-      </div>
+      </section>
+      <Footer />
     </div>
   );
 };

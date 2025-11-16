@@ -1,130 +1,182 @@
 // Purpose: To display the Homepage (landing page) of the Woodland Conservation website
-import React from "react";
+import React, { useState, useRef, useEffect } from "react";
+import bannerImage from "../assets/homepage-banner.jpg";
 import { Link } from "react-router-dom";
-import dayBackground from "../assets/forest1.png"; // Daytime forest image
-import nightBackground from "../assets/nightforest.png"; // Nighttime forest image
-import { FaTree, FaLeaf, FaCamera, FaMapMarkedAlt } from "react-icons/fa";
-import { BsArrowRightCircle } from "react-icons/bs";
+import { FaTree, FaCamera, FaMapMarkedAlt } from "react-icons/fa";
+import { BsArrowRightCircle, BsArrowUpRight } from "react-icons/bs";
+import { IoVolumeHigh, IoVolumeOff } from "react-icons/io5";
+import Footer from "./Footer";
+import ttsData from "../data/tts.json";
+import { speakText, stopSpeech } from "../utils/azureTTS";
 
-const Homepage = ({ dark }) => {
+const glassPanel =
+  "rounded-3xl border border-white/40 bg-white/60 p-6 shadow-lg shadow-slate-900/10 backdrop-blur-2xl transition-colors duration-300 dark:border-slate-700/60 dark:bg-slate-900/55";
+
+const coreTiles = [
+  {
+    icon: <FaTree className="text-emerald-500 text-3xl" />,
+    title: "Explore the Conservation Area",
+    body: "Follow the signed one kilometre trail out to wells, resting clearings, and the woodland labyrinth, then wander back through shifting light.",
+    cta: "Trail Map",
+    to: "/sitemap",
+  },
+  {
+    icon: <FaCamera className="text-amber-500 text-3xl" />,
+    title: "Share & Explore Photos",
+    body: "Browse community photos and add your own snapshots to show how the woods change through the year.",
+    cta: "Gallery",
+    to: "/gallery",
+  },
+  {
+    icon: <FaTree className="text-sky-500 text-3xl" />,
+    title: "Conservation Education",
+    body: "Meet the plants and wildlife that call this forest home and learn how we protect their habitat.",
+    cta: "Learn",
+    to: "/ecology",
+  },
+];
+
+const Homepage = () => {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const synthRef = useRef(null);
+
+  useEffect(() => {
+    return () => {
+      if (synthRef.current) {
+        stopSpeech(synthRef.current);
+        synthRef.current = null;
+      }
+    };
+  }, []);
+
+  const handleTextToSpeech = () => {
+    if (isPlaying && synthRef.current) {
+      stopSpeech(synthRef.current);
+      synthRef.current = null;
+      setIsPlaying(false);
+    } else {
+      const text = ttsData.homepage || "Welcome to the St. Margaret's Bay Woodland Conservation Site.";
+      synthRef.current = speakText(
+        text,
+        () => {
+          synthRef.current = null;
+          setIsPlaying(false);
+        },
+        () => {
+          synthRef.current = null;
+          setIsPlaying(false);
+        }
+      );
+      setIsPlaying(true);
+    }
+  };
+
   return (
-    <div
-      className={`flex flex-col min-h-screen bg-cover bg-center transition-all duration-500`}
-      style={{
-        backgroundImage: `linear-gradient(to bottom, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.9)), url(${
-          dark ? nightBackground : dayBackground
-        })`,
-      }}
-    >
-      {/* Header Section */}
-      <header className="text-center text-white py-20 px-6">
-        <h1 className="text-6xl md:text-8xl font-bold mb-6 drop-shadow-md">
-          Woodland Conservation Area
-        </h1>
-        <p className="text-xl md:text-3xl max-w-3xl mx-auto drop-shadow-md">
-          Immerse yourself in nature's wonders. Discover. Learn. Protect.
-        </p>
-        <button
-          className="bg-green-500 hover:bg-green-400 text-white px-8 py-4 mt-6 rounded-full shadow-lg font-semibold transition"
-          onClick={() => alert("Explore Section Coming Soon!")}
-        >
-          Explore Now
-        </button>
-      </header>
-
-      {/* Main Sections */}
-      <div className="flex-1 text-gray-900 bg-white/80 py-12 px-6">
-        <div className="max-w-7xl mx-auto grid md:grid-cols-3 gap-8">
-          {/* Interactive Cards */}
-          <div className="text-center bg-green-100/70 p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
-            <FaTree className="text-green-600 text-5xl mx-auto mb-4" />
-            <h2 className="text-2xl font-semibold mb-4">Explore the Conservation Area</h2>
-            <p className="text-lg">
-              Discover trails, wildlife, and serene spots for relaxation.
-            </p>
+    <div className="flex flex-col gap-8 text-slate-800 dark:text-slate-100">
+      <header className={`${glassPanel} flex flex-col gap-5 md:flex-row md:items-center md:justify-between`}>
+        <div className="flex-1 space-y-4">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-600 dark:text-emerald-300">
+            St. Margaret’s Bay Area Woodland
+          </p>
+          <h1 className="text-3xl font-semibold leading-tight sm:text-4xl">
+            A community forest that keeps local history and coastal birch standing strong.
+          </h1>
+          <p className="max-w-xl text-sm text-slate-600 dark:text-slate-300">
+            Welcome to the French Village Conservation Woodland at 71 St. Pauls Lane—27 acres of protected forest and wetlands. Walk the one-way trail to eight simple stops, from the exercise bar to the labyrinth, discover community stories along the way, and return the same route as the forest soundtrack changes around you.
+          </p>
+          <div className="flex flex-wrap gap-3">
             <Link
               to="/sitemap"
-              className="text-green-600 hover:text-green-800 mt-4 inline-flex items-center"
+              className="flex items-center gap-2 rounded-full border border-white/60 bg-white/70 px-5 py-2 text-xs font-semibold text-slate-700 shadow-md shadow-slate-900/10 transition hover:bg-white/90 dark:border-slate-600/60 dark:bg-slate-900/60 dark:text-slate-200"
             >
-              Learn More <BsArrowRightCircle className="ml-2" />
+              Trail Map
+              <FaMapMarkedAlt />
             </Link>
-          </div>
-          <div className="text-center bg-blue-100/70 p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
-            <FaLeaf className="text-blue-600 text-5xl mx-auto mb-4" />
-            <h2 className="text-2xl font-semibold mb-4">Conservation Education</h2>
-            <p className="text-lg">
-              Discover diverse wildlife across saltwater, freshwater, and terrestrial habitats.
-            </p>
+            <Link
+              to="/about"
+              className="flex items-center gap-2 rounded-full border border-white/60 bg-white/70 px-5 py-2 text-xs font-semibold text-slate-700 shadow-md shadow-slate-900/10 transition hover:bg-white/90 dark:border-slate-600/60 dark:bg-slate-900/60 dark:text-slate-200"
+            >
+              About
+              <BsArrowUpRight />
+            </Link>
             <Link
               to="/ecology"
-              className="text-blue-600 hover:text-blue-800 mt-4 inline-flex items-center"
+              className="flex items-center gap-2 rounded-full border border-white/50 bg-white/55 px-5 py-2 text-xs font-semibold text-slate-700 shadow-md shadow-slate-900/10 transition hover:bg-white/80 dark:border-slate-600/60 dark:bg-slate-900/60 dark:text-slate-200"
             >
-              Learn More <BsArrowRightCircle className="ml-2" />
+              Ecology
+              <BsArrowUpRight />
             </Link>
-          </div>
-          <div className="text-center bg-yellow-100/70 p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
-            <FaCamera className="text-yellow-600 text-5xl mx-auto mb-4" />
-            <h2 className="text-2xl font-semibold mb-4">Share & Explore Photos</h2>
-            <p className="text-lg">
-              Explore user-uploaded photos and share your own experiences from the conservation area.
-            </p>
             <Link
-              to="/gallery"
-              className="text-yellow-600 hover:text-yellow-800 mt-4 inline-flex items-center"
+              to="/contact"
+              className="flex items-center gap-2 rounded-full border border-white/50 bg-white/55 px-5 py-2 text-xs font-semibold text-slate-700 shadow-md shadow-slate-900/10 transition hover:bg-white/80 dark:border-slate-600/60 dark:bg-slate-900/60 dark:text-slate-200"
             >
-              Learn More <BsArrowRightCircle className="ml-2" />
+              Contact
+              <BsArrowUpRight />
             </Link>
           </div>
         </div>
-      </div>
-
-      {/* Quick Facts Section */}
-      <div className="bg-green-600/90 text-white py-16 px-8">
-        <h2 className="text-4xl font-bold text-center mb-6">Quick Facts</h2>
-        <div className="max-w-5xl mx-auto grid md:grid-cols-3 gap-8 text-center">
-          <div>
-            <h3 className="text-3xl font-bold">500+</h3>
-            <p>Acres of Protected Land</p>
-          </div>
-          <div>
-            <h3 className="text-3xl font-bold">200+</h3>
-            <p>Wildlife Species</p>
-          </div>
-          <div>
-            <h3 className="text-3xl font-bold">10,000+</h3>
-            <p>Annual Visitors</p>
-          </div>
+        <div className="flex items-center gap-4 md:flex-col">
+          <button
+            onClick={handleTextToSpeech}
+            className="flex items-center gap-2 rounded-full border border-white/60 bg-white/70 px-5 py-2 text-sm font-semibold text-emerald-700 shadow-md shadow-slate-900/10 hover:bg-white/90 dark:border-slate-600/60 dark:bg-slate-900/70 dark:text-emerald-200 transition-colors"
+          >
+            {isPlaying ? (
+              <>
+                <IoVolumeOff />
+                Stop
+              </>
+            ) : (
+              <>
+                <IoVolumeHigh />
+                Listen
+              </>
+            )}
+          </button>
+          <figure className="mt-4 w-full overflow-hidden rounded-2xl border border-white/40 shadow-inner shadow-slate-900/10 dark:border-slate-700/60 md:mt-0 md:w-60 lg:w-72">
+            <img src={bannerImage} alt="Trail canopy" className="h-full w-full object-cover" />
+          </figure>
         </div>
-      </div>
+      </header>
 
-      {/* Visitor Reviews Section */}
-      <div className="py-12 px-6 bg-white">
-        <h2 className="text-4xl font-bold text-center mb-8">What Visitors Say</h2>
-        <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-8">
-          <blockquote className="bg-gray-100 p-6 rounded-lg shadow-md">
-            <p className="italic text-lg">
-              "A serene and beautiful place to connect with nature. My kids
-              loved the guided tour!"
-            </p>
-            <footer className="mt-4 text-right">- Emily R.</footer>
-          </blockquote>
-          <blockquote className="bg-gray-100 p-6 rounded-lg shadow-md">
-            <p className="italic text-lg">
-              "The workshops on conservation were enlightening and fun!"
-            </p>
-            <footer className="mt-4 text-right">- John D.</footer>
-          </blockquote>
-        </div>
-      </div>
+      <section className="grid gap-4 md:grid-cols-3">
+        {coreTiles.map(({ icon, title, body, cta, to }) => (
+          <article key={title} className={`${glassPanel} flex flex-col gap-4`}>
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-white/50 bg-white/70 shadow-inner shadow-slate-900/10 dark:border-slate-600/60 dark:bg-slate-900/60">
+              {icon}
+            </div>
+            <div className="space-y-2">
+              <h2 className="text-lg font-semibold">{title}</h2>
+              <p className="text-sm text-slate-600 dark:text-slate-300">{body}</p>
+            </div>
+            <Link
+              to={to}
+              className="mt-auto inline-flex items-center gap-2 text-xs font-semibold text-slate-700 hover:underline dark:text-slate-200"
+            >
+              {cta}
+              <BsArrowRightCircle />
+            </Link>
+          </article>
+        ))}
+      </section>
 
+      <section className={`${glassPanel} grid gap-4 md:grid-cols-4`}>
+        {[
+          { value: "1 km", label: "Gentle out-and-back trail with eight simple landmarks and easy grades." },
+          { value: "8 stops", label: "Exercise bar, wells, resting clearings, listening telephone, and the labyrinth." },
+          { value: "Coastal birch", label: "Yellow birch stands and mixed forest cared for through invasive removal." },
+          { value: "Volunteer-led", label: "Neighbours and partners look after the path, signage, and stewardship events." },
+        ].map(({ value, label }) => (
+          <div
+            key={value}
+            className="rounded-2xl border border-white/40 bg-white/60 p-4 text-center shadow-inner shadow-slate-900/5 dark:border-slate-700/60 dark:bg-slate-900/55"
+          >
+            <p className="text-xl font-semibold text-emerald-600 dark:text-emerald-300">{value}</p>
+            <p className="mt-2 text-xs text-slate-600 dark:text-slate-300">{label}</p>
+          </div>
+        ))}
+      </section>
 
-      {/* Footer */}
-      <footer className="bg-gray-900 text-gray-300 py-8 text-center">
-        <p className="text-lg">
-          © {new Date().getFullYear()} Woodland Conservation Area. All Rights
-          Reserved.
-        </p>
-      </footer>
+      <Footer />
     </div>
   );
 };

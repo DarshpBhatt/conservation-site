@@ -1,9 +1,9 @@
 // Purpose: Navigation component that provides responsive navigation bar for desktop and mobile devices
 
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import logo from '../assets/logo.png'; // Importing the logo image
-import { IoMoon, IoSunny } from 'react-icons/io5'; // Importing icons for the dark mode toggle
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import logo from "../assets/logo.png";
+import { IoMoon, IoSunny } from "react-icons/io5";
 
 // Navigation component definition
 const Navigation = ({ toggleDarkMode, dark }) => {
@@ -28,76 +28,88 @@ const Navigation = ({ toggleDarkMode, dark }) => {
     setIsOpen(!isOpen);
   };
 
+  const linkBase =
+    "py-2 px-4 rounded-xl transition-colors duration-300 text-sm lg:text-base font-semibold text-slate-800 dark:text-slate-100 hover:bg-white/40 hover:text-emerald-700 dark:hover:text-emerald-300";
+
   return (
-    <div>
-      {/* Main navigation bar */}
-      <div className={`flex items-center justify-between transition-colors duration-300 ${dark ? 'bg-darkerBlue' : 'bg-darkBrown'} text-white h-16 p-4`}>
-        <div className="flex items-center">
-          {/* Logo section */}
-          <img src={logo} alt="Logo" className="h-16 w-16 mr-2" />
+    <nav className="fixed left-0 right-0 top-4 z-50 flex justify-center px-4 sm:px-6 lg:px-12">
+      <div className="mx-auto flex h-20 w-full max-w-7xl items-center justify-between rounded-2xl border border-white/40 bg-white/65 px-4 shadow-xl shadow-slate-900/15 backdrop-blur-2xl transition-colors duration-500 dark:border-slate-700/50 dark:bg-slate-900/70 sm:px-6 lg:px-8">
+        <div className="flex items-center gap-3">
+          <img src={logo} alt="Woodland Conservation Logo" className="h-14 w-14 rounded-xl border border-white/40 p-1 shadow-inner shadow-slate-900/10" />
+          <span className="hidden text-lg font-semibold text-slate-800 dark:text-slate-100 sm:block">
+            Woodland Conservation
+          </span>
         </div>
-        {/* Navigation links for desktop view */}
-        <div className="hidden md:flex items-center justify-center flex-1 space-x-4 text-xl">
-          <Link to="/" className="py-2 px-4 transition-colors duration-500 ease-in-out hover:bg-yellow-400 rounded-lg">Homepage</Link>
-          <Link to="/about" className="py-2 px-4 transition-colors duration-500 ease-in-out hover:bg-yellow-400 rounded-lg">About</Link>
-          <Link to="/sitemap" className="py-2 px-4 transition-colors duration-500 ease-in-out hover:bg-yellow-400 rounded-lg">Site Map</Link>
-          <Link to="/gallery" className="py-2 px-4 transition-colors duration-500 ease-in-out hover:bg-yellow-400 rounded-lg">Gallery</Link>
-          <Link to="/ecology" className="py-2 px-4 transition-colors duration-500 ease-in-out hover:bg-yellow-400 rounded-lg">Ecology</Link>
-          <Link to="#natural-burial" className="py-2 px-4 transition-colors duration-500 ease-in-out hover:bg-yellow-400 rounded-lg">Natural Burial</Link>
-          <Link to="#ecommerce" className="py-2 px-4 transition-colors duration-500 ease-in-out hover:bg-yellow-400 rounded-lg">eCommerce</Link>
-          <Link to="/contact" className="py-2 px-4 transition-colors duration-500 ease-in-out hover:bg-yellow-400 rounded-lg">Contact</Link> {/* Link to Contact page */}
+
+        <div className="hidden flex-1 items-center justify-center gap-2 md:flex">
+          <Link to="/" className={linkBase}>Home</Link>
+          <Link to="/about" className={linkBase}>About</Link>
+          <Link to="/sitemap" className={linkBase}>Map</Link>
+          <Link to="/gallery" className={linkBase}>Gallery</Link>
+          <Link to="/ecology" className={linkBase}>Ecology</Link>
+          <Link to="/natural-burial" className={linkBase}>Natural Burial</Link>
+          <Link to="#ecommerce" className={linkBase}>Shop</Link>
+          <Link to="/contact" className={linkBase}>Contact</Link>
         </div>
-        {/* Dark mode toggle button for desktop view */}
-        <div className="hidden md:flex items-center ml-4">
-          <button onClick={toggleDarkMode} className="flex items-center justify-center w-12 h-12 bg-gray-200 dark:bg-gray-800 rounded-full text-2xl focus:outline-none">
-            {dark ? <IoSunny className="text-yellow-500" /> : <IoMoon className="text-yellow-500" />}
+
+        <div className="flex items-center gap-3">
+          <button
+            onClick={toggleDarkMode}
+            className="flex h-12 w-12 items-center justify-center rounded-full border border-white/50 bg-white/70 text-2xl text-amber-500 shadow-md shadow-slate-900/10 backdrop-blur-xl transition hover:bg-white/90 dark:border-slate-600/60 dark:bg-slate-800/70"
+            aria-label="Toggle dark mode"
+          >
+            {dark ? <IoSunny /> : <IoMoon />}
           </button>
-        </div>
-        {/* Mobile menu toggle button */}
-        <div className="flex items-center md:hidden">
-          <button onClick={toggleDarkMode} className="flex items-center justify-center w-12 h-12 bg-gray-200 dark:bg-gray-800 rounded-full text-2xl focus:outline-none mr-4">
-            {dark ? <IoSunny className="text-yellow-500" /> : <IoMoon className="text-yellow-500" />}
-          </button>
-          <button onClick={toggleNav} className="text-white focus:outline-none z-20">
-            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={isOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"}></path>
+
+          <button
+            onClick={toggleNav}
+            className="block rounded-full border border-white/50 bg-white/70 p-2 text-slate-800 shadow-md shadow-slate-900/10 backdrop-blur-xl transition hover:bg-white/90 dark:border-slate-600/60 dark:bg-slate-800/70 dark:text-slate-100 md:hidden"
+            aria-label="Toggle navigation menu"
+          >
+            <svg className="h-7 w-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={isOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"} />
             </svg>
           </button>
         </div>
       </div>
-      {/* Mobile navigation menu */}
+
       {isOpen && (
         <>
-          {/* Backdrop overlay */}
-          <div 
-            className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
-            onClick={toggleNav}
-          />
-          {/* Mobile menu panel */}
-          <div className={`md:hidden fixed top-0 right-0 transition-colors duration-300 ${dark ? 'bg-darkerBlue' : 'bg-darkBrown'} text-white w-80 max-w-[85vw] h-screen p-4 z-50 transform transition-transform duration-300 ease-in-out shadow-2xl overflow-hidden`}>
-            {/* Close button */}
-            <div className="flex justify-end mb-6">
-              <button onClick={toggleNav} className="text-white focus:outline-none">
-                <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
+          <div className="fixed inset-0 z-40 bg-slate-900/60 backdrop-blur-md md:hidden" onClick={toggleNav} />
+          <div className="fixed top-4 right-4 z-50 w-[86vw] max-w-sm rounded-3xl border border-white/40 bg-white/70 p-6 shadow-2xl shadow-slate-900/30 backdrop-blur-3xl transition-colors duration-300 dark:border-slate-700/60 dark:bg-slate-900/70 md:hidden">
+            <div className="mb-6 flex items-center justify-between">
+              <span className="text-lg font-semibold text-slate-800 dark:text-slate-100">Navigate</span>
+              <button onClick={toggleNav} className="rounded-full border border-white/50 bg-white/80 p-2 text-slate-700 hover:bg-white dark:border-slate-600/60 dark:bg-slate-800/80 dark:text-slate-100">
+                <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
             </div>
-            {/* Navigation links */}
-            <nav className="flex flex-col space-y-2 text-lg overflow-y-auto">
-              <Link to="/" className="py-3 px-4 transition-colors duration-500 ease-in-out hover:bg-yellow-400 rounded-lg" onClick={toggleNav}>Homepage</Link>
-              <Link to="/about" className="py-3 px-4 transition-colors duration-500 ease-in-out hover:bg-yellow-400 rounded-lg" onClick={toggleNav}>About</Link>
-              <Link to="/sitemap" className="py-3 px-4 transition-colors duration-500 ease-in-out hover:bg-yellow-400 rounded-lg" onClick={toggleNav}>Site Map</Link>
-              <Link to="/gallery" className="py-3 px-4 transition-colors duration-500 ease-in-out hover:bg-yellow-400 rounded-lg" onClick={toggleNav}>Gallery</Link>
-              <Link to="/ecology" className="py-3 px-4 transition-colors duration-500 ease-in-out hover:bg-yellow-400 rounded-lg" onClick={toggleNav}>Ecology</Link>
-              <Link to="#natural-burial" className="py-3 px-4 transition-colors duration-500 ease-in-out hover:bg-yellow-400 rounded-lg" onClick={toggleNav}>Natural Burial</Link>
-              <Link to="#ecommerce" className="py-3 px-4 transition-colors duration-500 ease-in-out hover:bg-yellow-400 rounded-lg" onClick={toggleNav}>eCommerce</Link>
-              <Link to="/contact" className="py-3 px-4 transition-colors duration-500 ease-in-out hover:bg-yellow-400 rounded-lg" onClick={toggleNav}>Contact</Link>
+            <nav className="flex flex-col space-y-2 text-base">
+              {["/", "/about", "/sitemap", "/gallery", "/ecology", "/natural-burial", "#ecommerce", "/contact"].map((href, idx) => {
+                const labels = ["Home", "About", "Map", "Gallery", "Ecology", "Natural Burial", "Shop", "Contact"];
+                const classes =
+                  "block rounded-xl border border-white/30 bg-white/40 px-4 py-3 text-slate-800 shadow-inner shadow-slate-900/5 transition hover:bg-white/70 dark:border-slate-700/60 dark:bg-slate-800/60 dark:text-slate-100 dark:hover:bg-slate-800/80";
+
+                if (href.startsWith("#")) {
+                  return (
+                    <a key={href} href={href} onClick={toggleNav} className={classes}>
+                      {labels[idx]}
+                    </a>
+                  );
+                }
+
+                return (
+                  <Link key={href} to={href} onClick={toggleNav} className={classes}>
+                    {labels[idx]}
+                  </Link>
+                );
+              })}
             </nav>
           </div>
         </>
       )}
-    </div>
+    </nav>
   );
 };
 
