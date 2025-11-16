@@ -57,75 +57,51 @@ const WeatherWidget = () => {
     return () => clearInterval(interval);
   }, [resolvedApiKey]);
 
-  const locationLabel = "French Village, NS";
-
   const getWeatherIcon = (weatherMain) => {
     const iconMap = {
-      Clear: <FaSun className="text-2xl text-amber-400" />,
-      Clouds: <FaCloud className="text-2xl text-slate-400" />,
-      Rain: <FaCloudRain className="text-2xl text-sky-500" />,
-      Drizzle: <FaCloudRain className="text-2xl text-sky-500" />,
-      Snow: <FaSnowflake className="text-2xl text-blue-200" />,
-      Mist: <FaSmog className="text-2xl text-slate-300" />,
-      Fog: <FaSmog className="text-2xl text-slate-300" />,
+      Clear: <FaSun className="text-lg text-amber-400" />,
+      Clouds: <FaCloud className="text-lg text-slate-400" />,
+      Rain: <FaCloudRain className="text-lg text-sky-500" />,
+      Drizzle: <FaCloudRain className="text-lg text-sky-500" />,
+      Snow: <FaSnowflake className="text-lg text-blue-200" />,
+      Mist: <FaSmog className="text-lg text-slate-400" />,
+      Fog: <FaSmog className="text-lg text-slate-400" />,
     };
-    return iconMap[weatherMain] || <FaSun className="text-2xl text-amber-400" />;
+    return iconMap[weatherMain] || <FaSun className="text-lg text-amber-400" />;
   };
 
-  const WidgetContainer = ({ children }) => (
-    <div className="flex w-full max-w-[320px] items-center gap-3 rounded-2xl border border-white/50 bg-white/85 px-4 py-3 text-sm text-slate-700 shadow-xl shadow-slate-900/10 backdrop-blur-xl dark:border-slate-700/60 dark:bg-slate-900/75 dark:text-slate-100 sm:max-w-sm sm:px-5">
-      {children}
-    </div>
-  );
+  const baseClasses = "inline-flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-100";
 
   if (loading) {
     return (
-      <WidgetContainer>
-        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-50/70 text-emerald-500 dark:bg-slate-800/70">
-          <div className="h-5 w-5 animate-spin rounded-full border-2 border-emerald-500 border-t-transparent" />
-        </div>
-        <div className="flex flex-1 flex-col text-center sm:text-left">
-          <span className="text-[0.7rem] uppercase tracking-wide text-slate-400 dark:text-slate-500">
-            {locationLabel}
-          </span>
-          <span className="text-base font-semibold text-slate-600 dark:text-slate-300">Fetching weather...</span>
-        </div>
-      </WidgetContainer>
+      <div className={`${baseClasses} text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400`}>
+        <span className="inline-flex h-2 w-2 animate-pulse rounded-full bg-emerald-500" aria-hidden />
+        <span>Weather</span>
+      </div>
     );
   }
 
   if (error || !weather) {
     return (
-      <WidgetContainer>
-        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-100 text-slate-500 dark:bg-slate-800/70 dark:text-slate-300">
-          <IoLocationOutline className="text-xl" />
-        </div>
-        <div className="flex flex-1 flex-col text-center sm:text-left">
-          <span className="text-[0.7rem] uppercase tracking-wide text-slate-400 dark:text-slate-500">
-            {locationLabel}
-          </span>
-          <span className="text-base font-semibold text-slate-600 dark:text-slate-300">Weather unavailable</span>
-          {error && <span className="text-xs text-slate-400 dark:text-slate-500">Tap to retry later</span>}
-        </div>
-      </WidgetContainer>
+      <div className={`${baseClasses} text-slate-500 dark:text-slate-400`}>
+        <IoLocationOutline className="text-base" />
+        <span className="text-xs uppercase tracking-wide">Weather offline</span>
+      </div>
     );
   }
 
+  const temperature = Math.round(weather.main?.temp ?? 0);
+  const conditionMain = weather.weather?.[0]?.main || "Clear";
+  const conditionDescription = weather.weather?.[0]?.description || conditionMain;
+
   return (
-    <WidgetContainer>
-      <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-emerald-50/70 text-emerald-500 shadow-inner shadow-slate-900/5 dark:bg-slate-800/70">
-        {getWeatherIcon(weather.weather[0].main)}
-      </div>
-      <div className="flex flex-1 flex-col text-center sm:text-left">
-        <span className="text-[0.7rem] uppercase tracking-wide text-slate-400 dark:text-slate-500">
-          {locationLabel}
-        </span>
-        <span className="text-2xl font-semibold leading-tight text-slate-800 dark:text-white">
-          {Math.round(weather.main.temp)}°C
-        </span>
-        <span className="text-sm capitalize text-slate-500 dark:text-slate-300">{weather.weather[0].description}</span>
-      </div>
-    </WidgetContainer>
+    <div className={baseClasses} aria-label="Current weather">
+      <span className="inline-flex items-center justify-center text-emerald-500 dark:text-emerald-300">
+        {getWeatherIcon(conditionMain)}
+      </span>
+      <span className="text-base font-semibold leading-none text-slate-900 dark:text-white">{temperature}°C</span>
+      <span className="text-xs capitalize text-slate-500 dark:text-slate-400">{conditionDescription}</span>
+    </div>
   );
 };
 
