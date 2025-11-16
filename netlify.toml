@@ -9,4 +9,5 @@
 
 [build.environment]
   NODE_VERSION = "20"
+  VITE_OPENWEATHER_API_KEY = "bd5e378503939ddaee76f12ad7a97608"
 
