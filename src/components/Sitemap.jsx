@@ -231,14 +231,14 @@ export default function Sitemap({ dark = false }) {
     const [mapReady, setMapReady] = useState(false);
   const mapRef = useRef(null);
 
-  useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth <= 768);
-    };
-    handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
+    useEffect(() => {
+      const handleResize = () => {
+        setIsMobile(window.innerWidth <= 720);
+      };
+      handleResize();
+      window.addEventListener("resize", handleResize);
+      return () => window.removeEventListener("resize", handleResize);
+    }, []);
 
   const handleMapCreated = (mapInstance) => {
     mapRef.current = mapInstance;
@@ -526,23 +526,14 @@ export default function Sitemap({ dark = false }) {
   }, [pois]);
 
     const legendTheme = useMemo(
-      () =>
-        dark
-          ? {
-              cardBg: "rgba(15,23,42,0.88)",
-              cardBorder: "1px solid rgba(148,163,184,0.45)",
-              cardShadow: "0 16px 32px rgba(0,0,0,0.55)",
-              textColor: "#f8fafc",
-              headerColor: "#f1f5f9",
-            }
-          : {
-              cardBg: "rgba(255,255,255,0.85)",
-              cardBorder: "1px solid rgba(255,255,255,0.6)",
-              cardShadow: "0 12px 32px rgba(15,23,42,0.15)",
-              textColor: "#0f172a",
-              headerColor: "#0f172a",
-            },
-      [dark]
+      () => ({
+        cardBg: "rgba(255,255,255,0.85)",
+        cardBorder: "1px solid rgba(255,255,255,0.6)",
+        cardShadow: "0 12px 32px rgba(15,23,42,0.15)",
+        textColor: "#0f172a",
+        headerColor: "#0f172a",
+      }),
+      []
     );
 
     const mapLegendItems = [
