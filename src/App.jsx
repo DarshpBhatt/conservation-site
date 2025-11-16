@@ -60,9 +60,9 @@ function App() {
           }}
         ></div>
 
-        <div className="relative z-10 flex min-h-screen flex-col">
-          <Navigation toggleDarkMode={darkModeHandler} dark={dark} />
-          <main className="flex flex-1 flex-col gap-8 px-4 pb-4 pt-48 sm:px-6 lg:px-12 sm:pt-52 lg:pt-36">
+          <div className="relative z-10 flex min-h-screen flex-col">
+            <Navigation toggleDarkMode={darkModeHandler} dark={dark} />
+            <main className="flex flex-1 flex-col gap-8 px-4 py-24 sm:px-6 sm:py-28 lg:px-12 lg:py-24">
             <Routes>
               <Route path="/" element={<GlassPage><Homepage dark={dark} /></GlassPage>} />
               <Route path="/about" element={<GlassPage><About /></GlassPage>} />
