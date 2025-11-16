@@ -1,6 +1,13 @@
 // Purpose: To display the Gallery page with user-uploaded photos and image upload functionality 
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
+import { IoVolumeHigh, IoVolumeOff } from 'react-icons/io5';
+import ttsData from '../data/tts.json';
+import { speakText, stopSpeech } from '../utils/azureTTS';
+import Footer from './Footer';
+
+const glassPanel =
+  "rounded-3xl border border-white/40 bg-white/60 p-6 shadow-lg shadow-slate-900/10 backdrop-blur-2xl transition-colors duration-300 dark:border-slate-700/60 dark:bg-slate-900/55";
 
 // Import images from the assets folder (replace with your actual paths)
 import image1 from '../assets/download-1.jpg';
@@ -14,6 +21,40 @@ import image8 from '../assets/download-11.jpg';
 import image9 from '../assets/images-1.jpg';
 
 const Gallery = () => {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const synthRef = useRef(null);
+
+  useEffect(() => {
+    return () => {
+      if (synthRef.current) {
+        stopSpeech(synthRef.current);
+        synthRef.current = null;
+      }
+    };
+  }, []);
+
+  const handleTextToSpeech = () => {
+    if (isPlaying && synthRef.current) {
+      stopSpeech(synthRef.current);
+      synthRef.current = null;
+      setIsPlaying(false);
+    } else {
+      const text = ttsData.gallery || "Explore our photo gallery to see the beauty of the Woodland Conservation Site.";
+      synthRef.current = speakText(
+        text,
+        () => {
+          synthRef.current = null;
+          setIsPlaying(false);
+        },
+        () => {
+          synthRef.current = null;
+          setIsPlaying(false);
+        }
+      );
+      setIsPlaying(true);
+    }
+  };
+
   const [images, setImages] = useState([
     { src: image1, name: 'Image 1' },
     { src: image2, name: 'Image 2' },
@@ -46,19 +87,40 @@ const Gallery = () => {
   };
 
   return (
-    <div className="p-8 bg-gray-100 dark:bg-gray-900 min-h-screen">
-      <h1 className="text-4xl font-bold text-center mb-6 text-gray-900 dark:text-gray-100">
-        Enchanting Forest Gallery
-      </h1>
-      <p className="text-center text-lg text-gray-600 dark:text-gray-300 mb-8">
-        Discover the breathtaking beauty of forests and serene landscapes. Feel free to add your favorite photos to enrich this gallery!
-      </p>
+    <div className="flex flex-col gap-8 text-slate-800 dark:text-slate-100">
+      <header className={`${glassPanel} flex flex-col gap-5 md:flex-row md:items-center md:justify-between`}>
+        <div>
+          <h1 className="text-2xl font-semibold md:text-3xl">
+            Enchanting Forest Gallery
+          </h1>
+          <p className="mt-2 max-w-2xl text-sm text-slate-600 dark:text-slate-300">
+            Discover the breathtaking beauty of forests and serene landscapes. Feel free to add your favorite photos to enrich this gallery!
+          </p>
+        </div>
+        <button
+          onClick={handleTextToSpeech}
+          className="flex items-center gap-2 rounded-full border border-white/60 bg-white/70 px-5 py-2 text-sm font-semibold text-emerald-700 shadow-md shadow-slate-900/10 hover:bg-white dark:border-slate-600/60 dark:bg-slate-900/70 dark:text-emerald-200 transition-colors"
+        >
+          {isPlaying ? (
+            <>
+              <IoVolumeOff />
+              Stop
+            </>
+          ) : (
+            <>
+              <IoVolumeHigh />
+              Listen
+            </>
+          )}
+        </button>
+      </header>
 
       {/* Gallery Grid */}
-      <div
-        id="gallery"
-        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
-      >
+      <section className={`${glassPanel} p-6`}>
+        <div
+          id="gallery"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+        >
         {images.map((img, index) => (
           <div
             key={index}
@@ -76,12 +138,14 @@ const Gallery = () => {
             </div>
           </div>
         ))}
-      </div>
+        </div>
+      </section>
 
       {/* Drag-and-Drop Upload Section */}
-      <div
-        className="mt-10 text-center border-2 border-dashed border-gray-500 p-6 rounded-lg bg-gray-200 dark:bg-gray-800 transition-all duration-300 hover:shadow-lg hover:bg-gray-300 dark:hover:bg-gray-700"
-      >
+      <section className={`${glassPanel} p-6`}>
+        <div
+          className="text-center border-2 border-dashed border-white/60 dark:border-slate-700/60 p-6 rounded-2xl bg-white/40 dark:bg-slate-900/40 transition-all duration-300 hover:shadow-lg"
+        >
         <p className="text-gray-700 dark:text-gray-300">
           Drag and drop images here or click below to upload
         </p>
@@ -95,7 +159,9 @@ const Gallery = () => {
             style={{ display: 'none' }}
           />
         </label>
-      </div>
+        </div>
+      </section>
+      <Footer />
     </div>
   );
 };

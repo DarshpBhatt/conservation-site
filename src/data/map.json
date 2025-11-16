@@ -5,32 +5,56 @@
   "pollIntervalSeconds": 15,
   "areas": {
     "siteBorder": [
-      [44.624817, -63.921472],
-      [44.624817, -63.919472],
-      [44.623017, -63.919472],
-      [44.623017, -63.921472],
-      [44.624817, -63.921472]
+      [44.6267252, -63.9236383],
+      [44.6171265, -63.9075548],
+      [44.6159954, -63.9082112],
+      [44.6196995, -63.9140457],
+      [44.6203791, -63.9140672],
+      [44.6206197, -63.9151561],
+      [44.6205651, -63.9154160],
+      [44.6217831, -63.9173686],
+      [44.6219817, -63.9172345],
+      [44.6222223, -63.9178805],
+      [44.6246191, -63.9215955],
+      [44.6253524, -63.9228526],
+      [44.6266502, -63.9238271],
+      [44.6267252, -63.9236383]
     ],
     "rewildingArea": [
-      [44.624400, -63.920900],
-      [44.624300, -63.920100],
-      [44.623700, -63.920100],
-      [44.623700, -63.920900],
-      [44.624400, -63.920900]
+      [44.6258752, -63.9221694],
+      [44.6253524, -63.9228526],
+      [44.6266502, -63.9238271],
+      [44.6267252, -63.9236383],
+      [44.6258752, -63.9221694]
     ],
     "yellowBirchArea": [
-      [44.624600, -63.919900],
-      [44.624600, -63.919300],
-      [44.624100, -63.919300],
-      [44.624100, -63.919900],
-      [44.624600, -63.919900]
+      [44.6247135, -63.9202481],
+     
+      [44.6258752, -63.9221694],
+      
+      [44.6253524, -63.9228526],
+      [44.6241917, -63.9209429],
+      [44.6247135, -63.9202481]
     ],
     "wetlandArea": [
-      [44.623500, -63.921300],
-      [44.623500, -63.920700],
-      [44.623000, -63.920700],
-      [44.623000, -63.921300],
-      [44.623500, -63.921300]
+      [44.62068196265815, -63.91357210880862],
+      [44.62008115188539, -63.91359129291443],
+      [44.61978074416757, -63.91255535121347],
+      [44.61928916454943, -63.911903091624595],
+      [44.61864737378403, -63.91132756845727],
+      [44.61822406109886, -63.91100143866255],
+      [44.61844254545102, -63.91073286118473],
+      [44.61883854624347, -63.91080959760677],
+      [44.61898875273391, -63.9107136770789],
+      [44.61934378471241, -63.910963070451515],
+      [44.61928916454943, -63.91140430487937],
+      [44.6195895748107, -63.91182635520195],
+      [44.619767089234244, -63.911807171096726],
+      [44.61991729332294, -63.91151940951303],
+      [44.62012211645387, -63.911576961829894],
+      [44.62073658151087, -63.91341863596446],
+      [44.62072359289127, -63.91356349564225],
+      [44.62068196265815, -63.91357210880862]
     ]
   },
   "pois": [
@@ -39,60 +63,80 @@
       "type": "trailhead",
       "name": "Trailhead",
       "hoverText": "Trailhead",
-      "clickText": "Trailhead: This is the starting point of the trail through the conservation area.",
-      "lat": 44.624350,
-      "lng": -63.920500,
+      "clickText": "Trailhead: Start the 1 km trail here, right behind St. Paul's Church and beside the parking lot.",
+      "lat": 44.626562,
+      "lng": -63.923460,
       "audioSrc": "/audio/trailhead.mp3"
+    },
+    {
+      "id": "exercise-bar",
+      "type": "exercise",
+      "name": "Exercise Bar",
+      "hoverText": "Exercise Bar",
+      "clickText": "Exercise Bar: Use this simple bar to stretch or try pull-ups before you head down the trail.",
+      "lat": 44.626250,
+      "lng": -63.923472,
+      "audioSrc": null
     },
     {
       "id": "farmhouse",
       "type": "farmhouse",
       "name": "Farmhouse Foundation",
       "hoverText": "Farmhouse Foundation",
-      "clickText": "Farmhouse Foundation: The remains of an early homestead that once supported local farming activity.",
-      "lat": 44.624050,
-      "lng": -63.920450,
+      "clickText": "Farmhouse Foundation: These low stones mark the remains of a small forest cabin that once served a farm family.",
+      "lat": 44.626111,
+      "lng": -63.922917,
       "audioSrc": "/audio/farmhouse.mp3"
     },
     {
       "id": "well1",
       "type": "well",
       "name": "Well",
-      "hoverText": "Well",
-      "clickText": "Well: One of the historic wells that supplied fresh water to the farmhouse.",
-      "lat": 44.623950,
-      "lng": -63.920750,
+      "hoverText": "Old Historic Well",
+      "clickText": "Well: This old well gave water to church neighbors and the few families who lived nearby.",
+      "lat": 44.626389,
+      "lng": -63.923500,
       "audioSrc": "/audio/well1.mp3"
-    },
-    {
-      "id": "well2",
-      "type": "well",
-      "name": "Well",
-      "hoverText": "Well",
-      "clickText": "Well: A secondary well located near the rewilding edge.",
-      "lat": 44.624250,
-      "lng": -63.920750,
-      "audioSrc": "/audio/well2.mp3"
     },
     {
       "id": "sitting",
       "type": "sitting",
       "name": "Sitting Area",
       "hoverText": "Sitting Area",
-      "clickText": "Sitting Area: A quiet spot for rest, listening to birds, and observing the wetland.",
-      "lat": 44.623600,
-      "lng": -63.921000,
+      "clickText": "Sitting Area: A quiet clearing to rest, listen to the wind, and take in beauty of the nature.",
+      "lat": 44.625833,
+      "lng": -63.922611,
       "audioSrc": "/audio/sitting.mp3"
+    },
+    {
+      "id": "telephone-2",
+      "type": "telephone",
+      "name": "Second Telephone",
+      "hoverText": "Second Telephone",
+      "clickText": "Second Telephone: This gentle stop offers a wooden phone where visitors can speak to loved ones while feeling close to nature.",
+      "lat": 44.625139,
+      "lng": -63.921167,
+      "audioSrc": null
     },
     {
       "id": "yellow-birch",
       "type": "yellow-birch",
       "name": "Coastal Yellow Birch",
       "hoverText": "Coastal Yellow Birch",
-      "clickText": "Coastal Yellow Birch: A regionally significant species adapted to the Nova Scotian coast.",
-      "lat": 44.624350,
-      "lng": -63.919650,
+      "clickText": "Coastal Yellow Birch: From here the trail is full of bright yellow birch trees that are easy to spot because of their golden bark.",
+      "lat": 44.625528,
+      "lng": -63.922000,
       "audioSrc": "/audio/yellow-birch.mp3"
+    },
+    {
+      "id": "labyrinth",
+      "type": "labyrinth",
+      "name": "Labyrinth",
+      "hoverText": "Labyrinth",
+      "clickText": "Labyrinth: A labyrinth is a winding path you follow to reach the center and find calm.",
+      "lat": 44.624167,
+      "lng": -63.919556,
+      "audioSrc": "/audio/labyrinth.mp3"
     }
     ]
 }

@@ -2,12 +2,20 @@
 @tailwind components;
 @tailwind utilities;
 
-html, body {
+html,
+body,
+#root {
+  height: 100%;
+}
+
+html,
+body {
   overflow-x: hidden; /* Prevent horizontal scroll */
+  margin: 0;
 }
 
 body {
-  font-family: 'Calibri', sans-serif;
+  font-family: "Calibri", sans-serif;
   line-height: 1.5;
   color: #555; /* Adjust color to ensure medium/bright contrast */
 }
@@ -16,4 +24,9 @@ a {
   display: block;
   text-decoration: none;
   overflow-wrap: break-word; /* Ensures no word-breaking over lines */
+}
+
+.leaflet-container .leaflet-interactive:focus {
+  outline: none;
+  box-shadow: none;
 }
