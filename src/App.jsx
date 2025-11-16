@@ -62,19 +62,26 @@ function App() {
 
           <div className="relative z-10 flex min-h-screen flex-col">
             <Navigation toggleDarkMode={darkModeHandler} dark={dark} />
+            <div
+              aria-hidden="true"
+              className="shrink-0"
+              style={{
+                height: "calc(var(--nav-height, 5rem) + var(--nav-spacing, 1rem) + var(--nav-spacing, 1rem))",
+              }}
+            />
             <main className="flex flex-1 flex-col gap-8 px-4 py-24 sm:px-6 sm:py-28 lg:px-12 lg:py-24">
-            <Routes>
-              <Route path="/" element={<GlassPage><Homepage dark={dark} /></GlassPage>} />
-              <Route path="/about" element={<GlassPage><About /></GlassPage>} />
-              <Route path="/gallery" element={<GlassPage><Gallery /></GlassPage>} />
-              <Route path="/ecology" element={<GlassPage><Ecology /></GlassPage>} />
-              <Route path="/contact" element={<GlassPage><Contact /></GlassPage>} />
+              <Routes>
+                <Route path="/" element={<GlassPage><Homepage dark={dark} /></GlassPage>} />
+                <Route path="/about" element={<GlassPage><About /></GlassPage>} />
+                <Route path="/gallery" element={<GlassPage><Gallery /></GlassPage>} />
+                <Route path="/ecology" element={<GlassPage><Ecology /></GlassPage>} />
+                <Route path="/contact" element={<GlassPage><Contact /></GlassPage>} />
                 <Route path="/sitemap" element={<FullBleedGlass><SiteMap dark={dark} /></FullBleedGlass>} />
-              <Route path="/natural-burial" element={<GlassPage><NaturalBurial /></GlassPage>} />
-              <Route path="/shop" element={<GlassPage><Shop /></GlassPage>} />
-            </Routes>
-          </main>
-        </div>
+                <Route path="/natural-burial" element={<GlassPage><NaturalBurial /></GlassPage>} />
+                <Route path="/shop" element={<GlassPage><Shop /></GlassPage>} />
+              </Routes>
+            </main>
+          </div>
       </div>
     </Router>
   );
