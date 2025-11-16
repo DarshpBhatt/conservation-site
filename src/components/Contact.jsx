@@ -1,6 +1,6 @@
 // Purpose: To display the Contact section of the Woodland Conservation website
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState } from "react";
 import { FaPhone, FaEnvelope, FaMapMarkerAlt, FaFacebook, FaInstagram } from "react-icons/fa";
 import { FaXTwitter } from "react-icons/fa6";
 import Footer from "./Footer";
@@ -20,22 +20,6 @@ const Contact = () => {
             We would love to hear from you. Use the form below or connect with us through our social channels to share feedback, volunteer, or plan a visit.
           </p>
         </div>
-        <button
-          onClick={handleTextToSpeech}
-          className="flex items-center gap-2 rounded-full border border-white/60 bg-white/70 px-5 py-2 text-sm font-semibold text-emerald-700 shadow-md shadow-slate-900/10 hover:bg-white dark:border-slate-600/60 dark:bg-slate-900/70 dark:text-emerald-200 transition-colors"
-        >
-          {isPlaying ? (
-            <>
-              <IoVolumeOff />
-              Stop
-            </>
-          ) : (
-            <>
-              <IoVolumeHigh />
-              Listen
-            </>
-          )}
-        </button>
       </header>
 
       <section className={`${glassPanel} p-6`}>
