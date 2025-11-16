@@ -221,14 +221,14 @@ function sanitizePolygonCoords(poly) {
   return cleaned;
 }
 
-export default function Sitemap() {
+export default function Sitemap({ dark = false }) {
   /* ------- Debug logging ------- */
   console.log("Sitemap: mapData loaded:", !!mapData);
   console.log("Sitemap: mapData structure:", mapData ? Object.keys(mapData) : "No data");
 
   const [isMobile, setIsMobile] = useState(false);
   const [viewMode, setViewMode] = useState(VIEW_MODES.OVERVIEW);
-  const [mapReady, setMapReady] = useState(false);
+    const [mapReady, setMapReady] = useState(false);
   const mapRef = useRef(null);
 
   useEffect(() => {
@@ -468,13 +468,13 @@ export default function Sitemap() {
     return [avgLat, avgLng];
   }, [displayPois]);
 
-  const mapHeight = useMemo(() => `calc(100vh - ${NAV_LAYOUT_OFFSET_PX}px)`, []);
+    const mapHeight = useMemo(() => `calc(100vh - ${NAV_LAYOUT_OFFSET_PX}px)`, []);
   const boundsPadding = useMemo(() => {
     const base = viewMode === VIEW_MODES.TRAIL ? 24 : 48;
     const mobileBase = viewMode === VIEW_MODES.TRAIL ? 16 : 32;
     return isMobile ? [mobileBase, mobileBase] : [base, base];
   }, [isMobile, viewMode]);
-  const modeButtonClass = (mode) =>
+    const modeButtonClass = (mode) =>
     [
       "px-4 py-1.5 text-sm sm:text-base font-semibold rounded-full transition-all duration-200",
       viewMode === mode
@@ -517,13 +517,52 @@ export default function Sitemap() {
         display: "flex",
         gap: 8,
       };
-  const isTrailMode = viewMode === VIEW_MODES.TRAIL;
+    const isTrailMode = viewMode === VIEW_MODES.TRAIL;
   const trailLineCoords = useMemo(() => {
     return TRAIL_POI_IDS.map((id) => {
       const poi = pois.find((p) => p.id === id);
       return poi ? [poi.lat, poi.lng] : null;
     }).filter(Boolean);
   }, [pois]);
+
+    const legendTheme = useMemo(
+      () =>
+        dark
+          ? {
+              cardBg: "rgba(15,23,42,0.88)",
+              cardBorder: "1px solid rgba(148,163,184,0.45)",
+              cardShadow: "0 16px 32px rgba(0,0,0,0.55)",
+              textColor: "#f8fafc",
+              headerColor: "#f1f5f9",
+            }
+          : {
+              cardBg: "rgba(255,255,255,0.85)",
+              cardBorder: "1px solid rgba(255,255,255,0.6)",
+              cardShadow: "0 12px 32px rgba(15,23,42,0.15)",
+              textColor: "#0f172a",
+              headerColor: "#0f172a",
+            },
+      [dark]
+    );
+
+    const mapLegendItems = [
+      { label: "Site Border", stroke: "#000", variant: "line" },
+      {
+        label: AREA_STYLES.rewildingArea.label,
+        stroke: AREA_STYLES.rewildingArea.stroke,
+        fill: AREA_STYLES.rewildingArea.fill,
+      },
+      {
+        label: AREA_STYLES.yellowBirchArea.label,
+        stroke: AREA_STYLES.yellowBirchArea.stroke,
+        fill: AREA_STYLES.yellowBirchArea.fill,
+      },
+      {
+        label: AREA_STYLES.wetlandArea.label,
+        stroke: AREA_STYLES.wetlandArea.stroke,
+        fill: AREA_STYLES.wetlandArea.fill,
+      },
+    ];
 
   useEffect(() => {
     if (!mapReady || !mapRef.current) return;
@@ -810,100 +849,118 @@ export default function Sitemap() {
         </div>
 
         {/* Legends */}
-        {viewMode === VIEW_MODES.OVERVIEW && (
-          <div
-            style={{
-              position: "absolute",
-              right: 12,
-              top: 100,
-              zIndex: 20,
-              background: "rgba(255,255,255,0.85)",
-              padding: "12px 16px",
-              borderRadius: 12,
-              boxShadow: "0 12px 32px rgba(15,23,42,0.15)",
-              border: "1px solid rgba(255,255,255,0.6)",
-              minWidth: 180,
-            }}
-          >
-            <div style={{ fontWeight: 700, marginBottom: 8, fontSize: 14 }}>
-              Map Legend
-            </div>
-            {[
-              { label: "Site Border", stroke: "#000", fill: "transparent" },
-              {
-                label: AREA_STYLES.rewildingArea.label,
-                stroke: AREA_STYLES.rewildingArea.stroke,
-                fill: AREA_STYLES.rewildingArea.fill,
-              },
-              {
-                label: AREA_STYLES.yellowBirchArea.label,
-                stroke: AREA_STYLES.yellowBirchArea.stroke,
-                fill: AREA_STYLES.yellowBirchArea.fill,
-              },
-              {
-                label: AREA_STYLES.wetlandArea.label,
-                stroke: AREA_STYLES.wetlandArea.stroke,
-                fill: AREA_STYLES.wetlandArea.fill,
-              },
-            ].map((item) => (
+          {viewMode === VIEW_MODES.OVERVIEW && (
+            <div
+              style={{
+                position: "absolute",
+                right: 12,
+                top: 100,
+                zIndex: 20,
+                padding: "12px 16px",
+                borderRadius: 12,
+                minWidth: 180,
+                background: legendTheme.cardBg,
+                border: legendTheme.cardBorder,
+                boxShadow: legendTheme.cardShadow,
+                color: legendTheme.textColor,
+              }}
+            >
               <div
-                key={item.label}
+                style={{
+                  fontWeight: 700,
+                  marginBottom: 8,
+                  fontSize: 14,
+                  color: legendTheme.headerColor,
+                }}
+              >
+                Map Legend
+              </div>
+              {mapLegendItems.map((item) => (
+                <div
+                  key={item.label}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 10,
+                    marginBottom: 6,
+                    fontSize: 13,
+                    color: legendTheme.textColor,
+                  }}
+                >
+                  {item.variant === "line" ? (
+                    <span
+                      style={{
+                        width: 32,
+                        height: 3,
+                        borderRadius: 999,
+                        backgroundColor: item.stroke,
+                        display: "inline-block",
+                      }}
+                    />
+                  ) : (
+                    <span
+                      style={{
+                        width: 24,
+                        height: 12,
+                        borderRadius: 4,
+                        border: `2px solid ${item.stroke}`,
+                        background: item.fill,
+                      }}
+                    />
+                  )}
+                  {item.label}
+                </div>
+              ))}
+            </div>
+          )}
+
+          {viewMode === VIEW_MODES.TRAIL && (
+            <div
+              style={{
+                position: "absolute",
+                right: 12,
+                top: 100,
+                zIndex: 20,
+                padding: "12px 16px",
+                borderRadius: 12,
+                minWidth: 160,
+                background: legendTheme.cardBg,
+                border: legendTheme.cardBorder,
+                boxShadow: legendTheme.cardShadow,
+                color: legendTheme.textColor,
+              }}
+            >
+              <div
+                style={{
+                  fontWeight: 700,
+                  marginBottom: 8,
+                  fontSize: 14,
+                  color: legendTheme.headerColor,
+                }}
+              >
+                Trail Legend
+              </div>
+              <div
                 style={{
                   display: "flex",
                   alignItems: "center",
                   gap: 10,
-                  marginBottom: 6,
-                  fontSize: 13,
-                  color: "#0f172a",
+                  color: legendTheme.textColor,
                 }}
               >
                 <span
                   style={{
-                    width: 24,
-                    height: 12,
-                    borderRadius: 4,
-                    border: `2px solid ${item.stroke}`,
-                    background: item.fill,
+                    width: 32,
+                    height: 3,
+                    background: "#000",
+                    borderRadius: 999,
+                    display: "inline-block",
                   }}
                 />
-                {item.label}
+                Main Trail
               </div>
-            ))}
-          </div>
-        )}
-
-        {viewMode === VIEW_MODES.TRAIL && (
-          <div
-            style={{
-              position: "absolute",
-              right: 12,
-              top: 100,
-              zIndex: 20,
-              background: "rgba(255,255,255,0.85)",
-              padding: "12px 16px",
-              borderRadius: 12,
-              boxShadow: "0 12px 32px rgba(15,23,42,0.15)",
-              border: "1px solid rgba(255,255,255,0.6)",
-              minWidth: 160,
-            }}
-          >
-            <div style={{ fontWeight: 700, marginBottom: 8, fontSize: 14 }}>
-              Trail Legend
             </div>
-            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <span
-                style={{
-                  width: 26,
-                  height: 4,
-                  background: "#000",
-                  borderRadius: 2,
-                  display: "inline-block",
-                }}
-              />
-              Main Trail
-            </div>
-          </div>
-        )}
+          )}
 
         {/* (Legend and trail timeline removed per request) */}
       </div>
