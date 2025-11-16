@@ -36,49 +36,53 @@ const Navigation = ({ toggleDarkMode, dark }) => {
       <>
           <nav className="fixed left-0 right-0 top-4 z-50 flex justify-center px-4 sm:px-6 lg:px-12">
             <div className="mx-auto w-full max-w-7xl rounded-2xl border border-white/40 bg-white/65 px-3 py-3 shadow-xl shadow-slate-900/15 backdrop-blur-2xl transition-colors duration-500 dark:border-slate-700/50 dark:bg-slate-900/70 sm:px-4 sm:py-4 lg:px-6">
-              <div className="flex min-h-[3.5rem] flex-wrap items-center justify-between gap-3 sm:min-h-[4.5rem]">
-                <div className="order-1 flex flex-1 items-center gap-2 sm:gap-3">
-                  <div className="flex items-center gap-2 sm:gap-3">
-                    <img src={logo} alt="Woodland Conservation Logo" className="h-10 w-10 rounded-xl border border-white/40 p-1 shadow-inner shadow-slate-900/10 sm:h-14 sm:w-14" />
-                    <span className="hidden text-base font-semibold text-slate-800 dark:text-slate-100 sm:block sm:text-lg">
-                      Woodland Conservation
-                    </span>
+                <div className="flex min-h-[3.5rem] flex-wrap items-center justify-between gap-3 sm:min-h-[4.5rem]">
+                  <div className="order-1 flex min-w-0 flex-1 items-center gap-3 sm:gap-4">
+                    <div className="flex min-w-0 items-center gap-2 sm:gap-3">
+                      <img
+                        src={logo}
+                        alt="Woodland Conservation Logo"
+                        className="h-10 w-10 rounded-xl border border-white/40 p-1 shadow-inner shadow-slate-900/10 sm:h-14 sm:w-14"
+                      />
+                      <span className="hidden truncate text-base font-semibold text-slate-800 dark:text-slate-100 sm:block sm:text-lg">
+                        Woodland Conservation
+                      </span>
+                    </div>
+                    <div className="flex min-w-0 items-center text-xs sm:text-sm">
+                      <WeatherWidget />
+                    </div>
                   </div>
-                  <div className="flex flex-shrink-0 items-center rounded-2xl border border-white/30 bg-white/50 px-2 py-1 text-xs shadow-inner shadow-slate-900/5 backdrop-blur dark:border-slate-700/50 dark:bg-slate-800/40 sm:px-3 sm:text-sm">
-                    <WeatherWidget />
+
+                  <div className="order-3 hidden w-full items-center justify-center gap-1 md:order-2 md:flex md:flex-1 md:w-auto md:gap-2">
+                    <Link to="/" className={linkBase}>Home</Link>
+                    <Link to="/about" className={linkBase}>About</Link>
+                    <Link to="/sitemap" className={linkBase}>Map</Link>
+                    <Link to="/gallery" className={linkBase}>Gallery</Link>
+                    <Link to="/ecology" className={linkBase}>Ecology</Link>
+                    <Link to="/natural-burial" className={linkBase}>Natural Burial</Link>
+                    <Link to="/shop" className={linkBase}>Shop</Link>
+                    <Link to="/contact" className={linkBase}>Contact</Link>
                   </div>
-                  <button
-                    onClick={toggleNav}
-                    className="block rounded-full border border-white/50 bg-white/70 p-1.5 text-slate-800 shadow-md shadow-slate-900/10 backdrop-blur-xl transition hover:bg-white/90 dark:border-slate-600/60 dark:bg-slate-800/70 dark:text-slate-100 md:hidden sm:p-2"
-                    aria-label="Toggle navigation menu"
-                  >
-                    <svg className="h-5 w-5 sm:h-6 sm:w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={isOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"} />
-                    </svg>
-                  </button>
-                </div>
 
-                <div className="order-3 hidden w-full items-center justify-center gap-1 md:order-2 md:flex md:flex-1 md:w-auto md:gap-2">
-                  <Link to="/" className={linkBase}>Home</Link>
-                  <Link to="/about" className={linkBase}>About</Link>
-                  <Link to="/sitemap" className={linkBase}>Map</Link>
-                  <Link to="/gallery" className={linkBase}>Gallery</Link>
-                  <Link to="/ecology" className={linkBase}>Ecology</Link>
-                  <Link to="/natural-burial" className={linkBase}>Natural Burial</Link>
-                  <Link to="/shop" className={linkBase}>Shop</Link>
-                  <Link to="/contact" className={linkBase}>Contact</Link>
+                  <div className="order-2 flex items-center gap-2 sm:gap-3 md:order-3">
+                    <button
+                      onClick={toggleDarkMode}
+                      className="flex h-10 w-10 items-center justify-center rounded-full border border-white/50 bg-white/70 text-xl text-amber-500 shadow-md shadow-slate-900/10 backdrop-blur-xl transition hover:bg-white/90 dark:border-slate-600/60 dark:bg-slate-800/70 sm:h-12 sm:w-12 sm:text-2xl"
+                      aria-label="Toggle dark mode"
+                    >
+                      {dark ? <IoSunny /> : <IoMoon />}
+                    </button>
+                    <button
+                      onClick={toggleNav}
+                      className="block rounded-full border border-white/50 bg-white/70 p-2 text-slate-800 shadow-md shadow-slate-900/10 backdrop-blur-xl transition hover:bg-white/90 dark:border-slate-600/60 dark:bg-slate-800/70 dark:text-slate-100 md:hidden"
+                      aria-label="Toggle navigation menu"
+                    >
+                      <svg className="h-5 w-5 sm:h-6 sm:w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={isOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"} />
+                      </svg>
+                    </button>
+                  </div>
                 </div>
-
-                <div className="order-2 flex items-center gap-2 sm:gap-3 md:order-3">
-                  <button
-                    onClick={toggleDarkMode}
-                    className="flex h-10 w-10 items-center justify-center rounded-full border border-white/50 bg-white/70 text-xl text-amber-500 shadow-md shadow-slate-900/10 backdrop-blur-xl transition hover:bg-white/90 dark:border-slate-600/60 dark:bg-slate-800/70 sm:h-12 sm:w-12 sm:text-2xl"
-                    aria-label="Toggle dark mode"
-                  >
-                    {dark ? <IoSunny /> : <IoMoon />}
-                  </button>
-                </div>
-              </div>
             </div>
           </nav>
 
