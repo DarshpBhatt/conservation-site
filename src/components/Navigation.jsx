@@ -24,67 +24,65 @@ const Navigation = ({ toggleDarkMode, dark }) => {
     };
   }, [isOpen]);
 
-  // Function to toggle navigation menu
-  const toggleNav = () => {
-    setIsOpen(!isOpen);
-  };
+    // Function to toggle navigation menu
+    const toggleNav = () => {
+      setIsOpen(!isOpen);
+    };
 
-  const linkBase =
-    "py-2 px-4 rounded-xl transition-colors duration-300 text-sm lg:text-base font-semibold text-slate-800 dark:text-slate-100 hover:bg-white/40 hover:text-emerald-700 dark:hover:text-emerald-300";
+    const linkBase =
+      "py-2 px-4 rounded-xl transition-colors duration-300 text-sm lg:text-base font-semibold text-slate-800 dark:text-slate-100 hover:bg-white/40 hover:text-emerald-700 dark:hover:text-emerald-300";
 
-  return (
-    <>
-      <nav className="fixed left-0 right-0 top-4 z-50 flex justify-center px-4 sm:px-6 lg:px-12">
-        <div className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between rounded-2xl border border-white/40 bg-white/65 px-3 shadow-xl shadow-slate-900/15 backdrop-blur-2xl transition-colors duration-500 dark:border-slate-700/50 dark:bg-slate-900/70 sm:h-20 sm:px-4 lg:px-6">
-          <div className="flex items-center gap-2 sm:gap-3">
-            <img src={logo} alt="Woodland Conservation Logo" className="h-10 w-10 rounded-xl border border-white/40 p-1 shadow-inner shadow-slate-900/10 sm:h-14 sm:w-14" />
-            <span className="hidden text-base font-semibold text-slate-800 dark:text-slate-100 sm:block sm:text-lg">
-              Woodland Conservation
-            </span>
-          </div>
+    return (
+      <>
+        <nav className="fixed left-0 right-0 top-4 z-50 flex justify-center px-4 sm:px-6 lg:px-12">
+          <div className="mx-auto w-full max-w-7xl rounded-2xl border border-white/40 bg-white/65 px-3 py-3 shadow-xl shadow-slate-900/15 backdrop-blur-2xl transition-colors duration-500 dark:border-slate-700/50 dark:bg-slate-900/70 sm:px-4 sm:py-4 lg:px-6">
+            <div className="flex min-h-[3.5rem] items-center justify-between gap-3 sm:min-h-[4.5rem]">
+              <div className="flex items-center gap-2 sm:gap-3">
+                <img src={logo} alt="Woodland Conservation Logo" className="h-10 w-10 rounded-xl border border-white/40 p-1 shadow-inner shadow-slate-900/10 sm:h-14 sm:w-14" />
+                <span className="hidden text-base font-semibold text-slate-800 dark:text-slate-100 sm:block sm:text-lg">
+                  Woodland Conservation
+                </span>
+              </div>
 
-          <div className="hidden flex-1 items-center justify-center gap-1 md:flex md:gap-2">
-            <Link to="/" className={linkBase}>Home</Link>
-            <Link to="/about" className={linkBase}>About</Link>
-            <Link to="/sitemap" className={linkBase}>Map</Link>
-            <Link to="/gallery" className={linkBase}>Gallery</Link>
-            <Link to="/ecology" className={linkBase}>Ecology</Link>
-            <Link to="/natural-burial" className={linkBase}>Natural Burial</Link>
-            <Link to="/shop" className={linkBase}>Shop</Link>
-            <Link to="/contact" className={linkBase}>Contact</Link>
-          </div>
+              <div className="hidden flex-1 items-center justify-center gap-1 md:flex md:gap-2">
+                <Link to="/" className={linkBase}>Home</Link>
+                <Link to="/about" className={linkBase}>About</Link>
+                <Link to="/sitemap" className={linkBase}>Map</Link>
+                <Link to="/gallery" className={linkBase}>Gallery</Link>
+                <Link to="/ecology" className={linkBase}>Ecology</Link>
+                <Link to="/natural-burial" className={linkBase}>Natural Burial</Link>
+                <Link to="/shop" className={linkBase}>Shop</Link>
+                <Link to="/contact" className={linkBase}>Contact</Link>
+              </div>
 
-          <div className="flex items-center gap-2 sm:gap-3">
-            <div className="hidden lg:block lg:px-2">
+              <div className="flex items-center gap-2 sm:gap-3">
+                <div className="hidden lg:block lg:px-2">
+                  <WeatherWidget />
+                </div>
+                <button
+                  onClick={toggleDarkMode}
+                  className="flex h-10 w-10 items-center justify-center rounded-full border border-white/50 bg-white/70 text-xl text-amber-500 shadow-md shadow-slate-900/10 backdrop-blur-xl transition hover:bg-white/90 dark:border-slate-600/60 dark:bg-slate-800/70 sm:h-12 sm:w-12 sm:text-2xl"
+                  aria-label="Toggle dark mode"
+                >
+                  {dark ? <IoSunny /> : <IoMoon />}
+                </button>
+
+                <button
+                  onClick={toggleNav}
+                  className="block rounded-full border border-white/50 bg-white/70 p-1.5 text-slate-800 shadow-md shadow-slate-900/10 backdrop-blur-xl transition hover:bg-white/90 dark:border-slate-600/60 dark:bg-slate-800/70 dark:text-slate-100 md:hidden sm:p-2"
+                  aria-label="Toggle navigation menu"
+                >
+                  <svg className="h-5 w-5 sm:h-6 sm:w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={isOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"} />
+                  </svg>
+                </button>
+              </div>
+            </div>
+            <div className="mt-3 flex justify-center lg:hidden">
               <WeatherWidget />
             </div>
-            <button
-              onClick={toggleDarkMode}
-              className="flex h-10 w-10 items-center justify-center rounded-full border border-white/50 bg-white/70 text-xl text-amber-500 shadow-md shadow-slate-900/10 backdrop-blur-xl transition hover:bg-white/90 dark:border-slate-600/60 dark:bg-slate-800/70 sm:h-12 sm:w-12 sm:text-2xl"
-              aria-label="Toggle dark mode"
-            >
-              {dark ? <IoSunny /> : <IoMoon />}
-            </button>
-
-            <button
-              onClick={toggleNav}
-              className="block rounded-full border border-white/50 bg-white/70 p-1.5 text-slate-800 shadow-md shadow-slate-900/10 backdrop-blur-xl transition hover:bg-white/90 dark:border-slate-600/60 dark:bg-slate-800/70 dark:text-slate-100 md:hidden sm:p-2"
-              aria-label="Toggle navigation menu"
-            >
-              <svg className="h-5 w-5 sm:h-6 sm:w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={isOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"} />
-              </svg>
-            </button>
           </div>
-        </div>
-      </nav>
-      
-      {/* Weather widget extension below navbar for mobile/tablet */}
-      <div className="fixed left-0 right-0 top-28 z-40 flex justify-center px-4 sm:top-32 sm:px-6 lg:hidden">
-        <div className="mx-auto flex min-h-[3.5rem] w-full max-w-7xl items-center justify-center gap-2 rounded-2xl border border-white/40 bg-white/65 px-4 py-2.5 shadow-xl shadow-slate-900/15 backdrop-blur-2xl transition-colors duration-500 dark:border-slate-700/50 dark:bg-slate-900/70 sm:px-6 sm:py-3">
-          <WeatherWidget />
-        </div>
-      </div>
+        </nav>
 
       {isOpen && (
         <>
