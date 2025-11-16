@@ -55,8 +55,8 @@ const Navigation = ({ toggleDarkMode, dark }) => {
                 <Link to="/contact" className={linkBase}>Contact</Link>
               </div>
 
-              <div className="flex items-center gap-2 sm:gap-3">
-                <div className="hidden lg:block lg:px-2">
+                <div className="flex items-center gap-2 sm:gap-3">
+                  <div className="hidden lg:flex lg:items-center lg:px-2">
                   <WeatherWidget />
                 </div>
                 <button
