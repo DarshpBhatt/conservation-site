@@ -13,12 +13,14 @@ const WeatherWidget = () => {
   const lat = 44.623917;
   const lon = -63.920472;
 
+  const resolvedApiKey = import.meta.env.VITE_OPENWEATHER_API_KEY || "bd5e378503939ddaee76f12ad7a97608";
+
   useEffect(() => {
     const fetchWeather = async () => {
       try {
-        const apiKey = import.meta.env.VITE_OPENWEATHER_API_KEY;
+        const apiKey = resolvedApiKey;
         console.log("API Key check:", apiKey ? "Found" : "Missing");
-        
+
         if (!apiKey) {
           console.error("Weather API key not configured");
           setError("API key missing");
@@ -53,7 +55,7 @@ const WeatherWidget = () => {
     // Refresh every 10 minutes
     const interval = setInterval(fetchWeather, 600000);
     return () => clearInterval(interval);
-  }, []);
+  }, [resolvedApiKey]);
 
   const getWeatherIcon = (weatherMain) => {
     const iconMap = {
