@@ -1,4 +1,4 @@
-// Purpose: Natural Burial page component with Azure TTS support
+// Purpose: Natural Burial page component
 
 import React, { useState, useRef, useEffect } from "react";
 import {

@@ -1,6 +1,6 @@
 // Purpose: To display the About page of the Woodland Conservation website with site information and mission statement  
 
-import React, { useState, useRef, useEffect } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
 import lakeshoreImage from "../assets/about/brinelakelookout.jpg";
 import exerciseImage from "../assets/about/exercise.jpg";
@@ -110,7 +110,6 @@ const photoStories = [
 ];
 
 export default function About() {
-
   return (
     <div className="flex flex-col gap-8 text-slate-800 dark:text-slate-100">
       <section className={`${glassPanel} flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between`}>
@@ -158,22 +157,6 @@ export default function About() {
               Contact
               <BsArrowUpRight />
             </Link>
-            <button
-              onClick={handleTextToSpeech}
-              className="flex items-center gap-2 rounded-full border border-white/60 bg-white/70 px-5 py-2 text-xs font-semibold text-emerald-700 shadow-md shadow-slate-900/10 hover:bg-white/90 dark:border-slate-600/60 dark:bg-slate-900/70 dark:text-emerald-200 transition-colors"
-            >
-              {isPlaying ? (
-                <>
-                  <IoVolumeOff />
-                  Stop
-                </>
-              ) : (
-                <>
-                  <IoVolumeHigh />
-                  Listen
-                </>
-              )}
-            </button>
           </div>
         </div>
         <div className="flex items-center gap-4 lg:flex-col">
