@@ -72,3 +72,13 @@ to-minify)
 
 ### hosted on Azure
 https://purple-field-0f81f6c10.3.azurestaticapps.net
+
+## Environment Variables
+
+The weather widget depends on the OpenWeather API. Create a `.env.local` file in the project root (or configure the variable through your hosting provider) with the following entry:
+
+```
+VITE_OPENWEATHER_API_KEY=<your-openweather-api-key>
+```
+
+Restart the dev server after creating or updating the file so Vite can pick up the new value.
