@@ -1,0 +1,60 @@
+{
+  "metadata": {
+    "title": "St. Margaret's Bay Species List",
+    "location": "St. Margaret's Bay and Surrounding Area, Nova Scotia",
+    "education_level": "Grade 8",
+    "description": "Curated list of local flora, fauna, and fungi species with available photo assets.",
+    "last_updated": "2025",
+    "total_species": 35,
+    "species_with_images": 35,
+    "category_counts": {
+      "flora": 10,
+      "fauna": 22,
+      "fungi": 3
+    }
+  },
+  "species_by_category": {
+    "flora": [
+      "Apple Trees",
+      "Black Spruce",
+      "Fern",
+      "Goldenrod",
+      "Maple",
+      "Pine",
+      "Pine Cherry",
+      "Spruce",
+      "Wild Pear",
+      "Yellow Coastal Birch"
+    ],
+    "fauna": [
+      "Alder Flycatcher",
+      "American Robin",
+      "Atlantic Kill Fish",
+      "Bald Eagle",
+      "Beaver",
+      "Black Bear",
+      "Black-legged Tick",
+      "Blue Jay",
+      "Bumblebee",
+      "Canada Goose",
+      "Chickadee",
+      "Crow/Raven",
+      "Duck (Mallard Type)",
+      "Monarch Butterfly",
+      "Moose",
+      "Raccoon",
+      "Rainbow Smelt",
+      "Red Fox",
+      "Red Squirrel",
+      "Ruffed Grouse",
+      "Snowshoe Hare",
+      "White-tailed Deer"
+    ],
+    "fungi": [
+      "Hoof Fungus",
+      "Lungwort Lichen",
+      "Saffron Milkcap"
+    ]
+  }
+}
+

@@ -1,0 +1,129 @@
+// Purpose: Navigation component that provides responsive navigation bar for desktop and mobile devices
+
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import logo from "../assets/logo.png";
+import { IoMoon, IoSunny } from "react-icons/io5";
+import WeatherWidget from "./WeatherWidget";
+
+// Navigation component definition
+const Navigation = ({ toggleDarkMode, dark }) => {
+  const [isOpen, setIsOpen] = useState(false); // State to manage the navigation menu
+
+  // Prevent body scroll when mobile menu is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    
+    // Cleanup function to reset overflow when component unmounts
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
+
+  // Function to toggle navigation menu
+  const toggleNav = () => {
+    setIsOpen(!isOpen);
+  };
+
+  const linkBase =
+    "py-2 px-4 rounded-xl transition-colors duration-300 text-sm lg:text-base font-semibold text-slate-800 dark:text-slate-100 hover:bg-white/40 hover:text-emerald-700 dark:hover:text-emerald-300";
+
+  return (
+    <>
+      <nav className="fixed left-0 right-0 top-4 z-50 flex justify-center px-4 sm:px-6 lg:px-12">
+        <div className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between rounded-2xl border border-white/40 bg-white/65 px-3 shadow-xl shadow-slate-900/15 backdrop-blur-2xl transition-colors duration-500 dark:border-slate-700/50 dark:bg-slate-900/70 sm:h-20 sm:px-4 lg:px-6">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <img src={logo} alt="Woodland Conservation Logo" className="h-10 w-10 rounded-xl border border-white/40 p-1 shadow-inner shadow-slate-900/10 sm:h-14 sm:w-14" />
+            <span className="hidden text-base font-semibold text-slate-800 dark:text-slate-100 sm:block sm:text-lg">
+              Woodland Conservation
+            </span>
+          </div>
+
+          <div className="hidden flex-1 items-center justify-center gap-1 md:flex md:gap-2">
+            <Link to="/" className={linkBase}>Home</Link>
+            <Link to="/about" className={linkBase}>About</Link>
+            <Link to="/sitemap" className={linkBase}>Map</Link>
+            <Link to="/gallery" className={linkBase}>Gallery</Link>
+            <Link to="/ecology" className={linkBase}>Ecology</Link>
+            <Link to="/natural-burial" className={linkBase}>Natural Burial</Link>
+            <Link to="/shop" className={linkBase}>Shop</Link>
+            <Link to="/contact" className={linkBase}>Contact</Link>
+          </div>
+
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="hidden lg:block lg:px-2">
+              <WeatherWidget />
+            </div>
+            <button
+              onClick={toggleDarkMode}
+              className="flex h-10 w-10 items-center justify-center rounded-full border border-white/50 bg-white/70 text-xl text-amber-500 shadow-md shadow-slate-900/10 backdrop-blur-xl transition hover:bg-white/90 dark:border-slate-600/60 dark:bg-slate-800/70 sm:h-12 sm:w-12 sm:text-2xl"
+              aria-label="Toggle dark mode"
+            >
+              {dark ? <IoSunny /> : <IoMoon />}
+            </button>
+
+            <button
+              onClick={toggleNav}
+              className="block rounded-full border border-white/50 bg-white/70 p-1.5 text-slate-800 shadow-md shadow-slate-900/10 backdrop-blur-xl transition hover:bg-white/90 dark:border-slate-600/60 dark:bg-slate-800/70 dark:text-slate-100 md:hidden sm:p-2"
+              aria-label="Toggle navigation menu"
+            >
+              <svg className="h-5 w-5 sm:h-6 sm:w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={isOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"} />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </nav>
+      
+      {/* Weather widget extension below navbar for mobile/tablet */}
+      <div className="fixed left-0 right-0 top-28 z-40 flex justify-center px-4 sm:top-32 sm:px-6 lg:hidden">
+        <div className="mx-auto flex min-h-[3.5rem] w-full max-w-7xl items-center justify-center gap-2 rounded-2xl border border-white/40 bg-white/65 px-4 py-2.5 shadow-xl shadow-slate-900/15 backdrop-blur-2xl transition-colors duration-500 dark:border-slate-700/50 dark:bg-slate-900/70 sm:px-6 sm:py-3">
+          <WeatherWidget />
+        </div>
+      </div>
+
+      {isOpen && (
+        <>
+          <div className="fixed inset-0 z-40 bg-slate-900/60 backdrop-blur-md md:hidden" onClick={toggleNav} />
+          <div className="fixed top-4 right-4 z-50 w-[86vw] max-w-sm rounded-3xl border border-white/40 bg-white/70 p-6 shadow-2xl shadow-slate-900/30 backdrop-blur-3xl transition-colors duration-300 dark:border-slate-700/60 dark:bg-slate-900/70 md:hidden">
+            <div className="mb-6 flex items-center justify-between">
+              <span className="text-lg font-semibold text-slate-800 dark:text-slate-100">Navigate</span>
+              <button onClick={toggleNav} className="rounded-full border border-white/50 bg-white/80 p-2 text-slate-700 hover:bg-white dark:border-slate-600/60 dark:bg-slate-800/80 dark:text-slate-100">
+                <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <nav className="flex flex-col space-y-2 text-base">
+              {["/", "/about", "/sitemap", "/gallery", "/ecology", "/natural-burial", "/shop", "/contact"].map((href, idx) => {
+                const labels = ["Home", "About", "Map", "Gallery", "Ecology", "Natural Burial", "Shop", "Contact"];
+                const classes =
+                  "block rounded-xl border border-white/30 bg-white/40 px-4 py-3 text-slate-800 shadow-inner shadow-slate-900/5 transition hover:bg-white/70 dark:border-slate-700/60 dark:bg-slate-800/60 dark:text-slate-100 dark:hover:bg-slate-800/80";
+
+                if (href.startsWith("#")) {
+                  return (
+                    <a key={href} href={href} onClick={toggleNav} className={classes}>
+                      {labels[idx]}
+                    </a>
+                  );
+                }
+
+                return (
+                  <Link key={href} to={href} onClick={toggleNav} className={classes}>
+                    {labels[idx]}
+                  </Link>
+                );
+              })}
+            </nav>
+          </div>
+        </>
+      )}
+    </>
+  );
+};
+
+export default Navigation;
