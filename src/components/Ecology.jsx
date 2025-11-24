@@ -4,6 +4,7 @@ import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import ecologyData from '../data/ecologydata.json';
 import Footer from "./Footer";
+import * as SpeechSDK from "microsoft-cognitiveservices-speech-sdk";
 
 const imageModules = import.meta.glob('../assets/ecologyimages/*', {
   eager: true,
@@ -79,7 +80,16 @@ const Ecology = () => {
   const [isClient, setIsClient] = useState(false);
   const scrollPositionRef = useRef(0);
 
-  const categoryKeys = useMemo(() => Object.keys(ecologyData.species_by_category), []);
+  // 🔊 AUDIO STATE & REFS FOR HEADER
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const synthesizerRef = useRef(null);
+  const playerRef = useRef(null);
+
+  const categoryKeys = useMemo(
+    () => Object.keys(ecologyData.species_by_category),
+    []
+  );
+
   const categoryOptions = useMemo(
     () => ['All', ...categoryKeys.map(formatCategoryLabel)],
     [categoryKeys],
@@ -95,10 +105,12 @@ const Ecology = () => {
     [allSpecies, categoryFilter],
   );
 
+  // Set client flag for portal
   useEffect(() => {
     setIsClient(true);
   }, []);
 
+  // Lock body scroll when modal open
   useEffect(() => {
     if (selectedItem) {
       scrollPositionRef.current = window.scrollY;
@@ -121,6 +133,87 @@ const Ecology = () => {
     }
   }, [selectedItem]);
 
+  // 🔊 Setup Azure Text-to-Speech for header
+  useEffect(() => {
+    const speechKey = import.meta.env.VITE_AZURE_SPEECH_KEY;
+    const speechRegion = import.meta.env.VITE_AZURE_REGION;
+
+    if (!speechKey || !speechRegion) {
+      console.warn("Azure Speech key/region are missing in .env");
+      return;
+    }
+
+    const speechConfig = SpeechSDK.SpeechConfig.fromSubscription(
+      speechKey,
+      speechRegion
+    );
+    speechConfig.speechSynthesisVoiceName = "en-US-JennyNeural";
+
+    const player = new SpeechSDK.SpeakerAudioDestination();
+    const audioConfig = SpeechSDK.AudioConfig.fromSpeakerOutput(player);
+
+    const synthesizer = new SpeechSDK.SpeechSynthesizer(
+      speechConfig,
+      audioConfig
+    );
+
+    synthesizerRef.current = synthesizer;
+    playerRef.current = player;
+
+    return () => {
+      if (synthesizerRef.current) synthesizerRef.current.close();
+      synthesizerRef.current = null;
+      playerRef.current = null;
+    };
+  }, []);
+
+  const playHeaderAudio = () => {
+    const synthesizer = synthesizerRef.current;
+    const player = playerRef.current;
+    if (!synthesizer) return;
+
+    const text =
+      "Species you may encounter. " +
+      "Explore the flora, fauna, and fungi of Saint Margaret's Bay. " +
+      "Use the filter below to focus on a category, then open a card to view the reference photo.";
+
+    if (player) {
+      player.resume();
+    }
+
+    setIsSpeaking(true);
+    synthesizer.speakTextAsync(
+      text,
+      () => setIsSpeaking(false),
+      (err) => {
+        console.error("Speech error:", err);
+        setIsSpeaking(false);
+      }
+    );
+  };
+
+  const stopHeaderAudio = () => {
+    const synthesizer = synthesizerRef.current;
+    const player = playerRef.current;
+
+    if (player) {
+      player.pause();
+    }
+
+    if (!synthesizer) {
+      setIsSpeaking(false);
+      return;
+    }
+
+    synthesizer.stopSpeakingAsync(
+      () => setIsSpeaking(false),
+      (err) => {
+        console.error("Stop speaking error:", err);
+        setIsSpeaking(false);
+      }
+    );
+  };
+
   const closeModal = () => setSelectedItem(null);
 
   const glassPanel =
@@ -128,15 +221,36 @@ const Ecology = () => {
 
   return (
     <div className="flex flex-col gap-8 text-slate-800 dark:text-slate-100">
+      {/* HEADER WITH AUDIO */}
       <header
         className={`${glassPanel} flex flex-col gap-5 md:flex-row md:items-center md:justify-between`}
       >
         <div>
-          <h1 className="text-2xl font-semibold md:text-3xl">Species you may encounter</h1>
+          <h1 className="text-2xl font-semibold md:text-3xl">
+            Species you may encounter
+          </h1>
           <p className="mt-2 max-w-2xl text-sm text-slate-600 dark:text-slate-300">
             Explore the flora, fauna, and fungi of St. Margaret&apos;s Bay. Use the filter below to
             focus on a category, then open a card to view the reference photo.
           </p>
+
+          <div className="flex gap-3 mt-4">
+            <button
+              type="button"
+              onClick={playHeaderAudio}
+              className="px-4 py-2 rounded-full bg-emerald-600 text-white text-sm font-medium shadow hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900"
+            >
+              Play Audio
+            </button>
+
+            <button
+              type="button"
+              onClick={stopHeaderAudio}
+              className="px-4 py-2 rounded-full bg-red-600 text-white text-sm font-medium shadow hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900"
+            >
+              Stop Audio
+            </button>
+          </div>
         </div>
       </header>
 
@@ -336,5 +450,3 @@ const Ecology = () => {
 };
 
 export default Ecology;
-
-

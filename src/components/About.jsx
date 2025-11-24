@@ -1,6 +1,6 @@
 // Purpose: To display the About page of the Woodland Conservation website with site information and mission statement  
 
-import React from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
 import lakeshoreImage from "../assets/about/brinelakelookout.jpg";
 import exerciseImage from "../assets/about/exercise.jpg";
@@ -11,9 +11,18 @@ import historicWellImage from "../assets/about/historicwell.jpg";
 import donationImage from "../assets/about/BrineGravestone.jpg";
 import churchSketchImage from "../assets/about/stpaulchurchskech old.png";
 import ecologyImage from "../assets/about/neighbour.JPG";
-import { FaTree, FaWater, FaHandsHelping, FaMapMarkedAlt, FaLeaf, FaRoute, FaCompass } from "react-icons/fa";
+import {
+  FaTree,
+  FaWater,
+  FaHandsHelping,
+  FaMapMarkedAlt,
+  FaLeaf,
+  FaRoute,
+  FaCompass,
+} from "react-icons/fa";
 import { BsArrowUpRight } from "react-icons/bs";
 import Footer from "./Footer";
+import * as SpeechSDK from "microsoft-cognitiveservices-speech-sdk";
 
 const glassPanel =
   "rounded-3xl border border-white/40 bg-white/60 p-6 shadow-lg shadow-slate-900/10 backdrop-blur-2xl transition-colors duration-300 dark:border-slate-700/60 dark:bg-slate-900/55";
@@ -80,54 +89,184 @@ const photoStories = [
   {
     image: exerciseImage,
     title: "Trailhead Warm-Up",
-    caption: "Start with gentle stretches at the exercise bar designed for all ages to loosen up before the kilometre loop.",
+    caption:
+      "Start with gentle stretches at the exercise bar designed for all ages to loosen up before the kilometre loop.",
   },
   {
     image: labyrinthImage,
     title: "Labyrinth of Quiet Steps",
-    caption: "Walk the spiral path slowly, pause at the centre, and let the breeze carry the sounds of the woods around you.",
+    caption:
+      "Walk the spiral path slowly, pause at the centre, and let the breeze carry the sounds of the woods around you.",
   },
   {
     image: telephoneImage,
     title: "Listening Telephone",
-    caption: "Take a moment at the woodland telephone to share a gentle message with loved ones who are remembered among the trees.",
+    caption:
+      "Take a moment at the woodland telephone to share a gentle message with loved ones who are remembered among the trees.",
   },
   {
     image: farmhouseImage,
     title: "Farmhouse Foundations",
-    caption: "Imagine life in the clearing where the original farmhouse stood and learn about daily chores from 100 years ago.",
+    caption:
+      "Imagine life in the clearing where the original farmhouse stood and learn about daily chores from 100 years ago.",
   },
   {
     image: historicWellImage,
     title: "Historic Wells",
-    caption: "Stone wells that once provided fresh water now sit among fern-lined clearings with stories about the families who drew from them.",
+    caption:
+      "Stone wells that once provided fresh water now sit among fern-lined clearings with stories about the families who drew from them.",
   },
   {
     image: ecologyImage,
     title: "Meet the Woodland Neighbours",
-    caption: "Discover mossy logs, lichens, and the wildlife who depend on this forest—then continue learning in our ecology guide.",
+    caption:
+      "Discover mossy logs, lichens, and the wildlife who depend on this forest—then continue learning in our ecology guide.",
   },
 ];
 
 export default function About() {
+  // ---- TEXT TO SPEECH (Azure) ----
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const synthesizerRef = useRef(null);
+  const playerRef = useRef(null); // controllable player
+
+  useEffect(() => {
+    const speechKey = import.meta.env.VITE_AZURE_SPEECH_KEY;
+    const speechRegion = import.meta.env.VITE_AZURE_REGION;
+
+    if (!speechKey || !speechRegion) {
+      console.warn("Azure Speech key/region are missing in .env");
+      return;
+    }
+
+    const speechConfig = SpeechSDK.SpeechConfig.fromSubscription(
+      speechKey,
+      speechRegion
+    );
+    speechConfig.speechSynthesisVoiceName = "en-US-JennyNeural"; // choose your neural voice
+
+    const player = new SpeechSDK.SpeakerAudioDestination();
+    const audioConfig = SpeechSDK.AudioConfig.fromSpeakerOutput(player);
+
+    const synthesizer = new SpeechSDK.SpeechSynthesizer(
+      speechConfig,
+      audioConfig
+    );
+
+    synthesizerRef.current = synthesizer;
+    playerRef.current = player;
+
+    return () => {
+      synthesizer.close();
+      synthesizerRef.current = null;
+      playerRef.current = null;
+    };
+  }, []);
+
+  const speakText = (text) => {
+    const synthesizer = synthesizerRef.current;
+    const player = playerRef.current;
+    if (!synthesizer || !text) return;
+
+    if (player) {
+      player.resume(); // resume if previously paused
+    }
+
+    setIsSpeaking(true);
+    synthesizer.speakTextAsync(
+      text,
+      () => {
+        setIsSpeaking(false);
+      },
+      (err) => {
+        console.error("Speech error:", err);
+        setIsSpeaking(false);
+      }
+    );
+  };
+
+  const stopSpeech = () => {
+    const synthesizer = synthesizerRef.current;
+    const player = playerRef.current;
+
+    if (player) {
+      player.pause(); // immediate local stop
+    }
+
+    if (!synthesizer) {
+      setIsSpeaking(false);
+      return;
+    }
+
+    synthesizer.stopSpeakingAsync(
+      () => {
+        setIsSpeaking(false);
+      },
+      (err) => {
+        console.error("Stop speaking error:", err);
+        setIsSpeaking(false);
+      }
+    );
+  };
+  // ---- END TEXT TO SPEECH ----
+
   return (
     <div className="flex flex-col gap-8 text-slate-800 dark:text-slate-100">
-      <section className={`${glassPanel} flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between`}>
+      {/* HERO SECTION */}
+      <section
+        className={`${glassPanel} flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between`}
+      >
         <div className="flex-1 space-y-5">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-600 dark:text-emerald-300">
             About the Conservation Woodland
           </p>
           <h1 className="text-2xl font-semibold md:text-3xl">
-            French Village Conservation Woodland is the forest family behind St. Paul's Church.
+            French Village Conservation Woodland is the forest family behind
+            St. Paul&apos;s Church.
           </h1>
           <p className="text-sm text-slate-600 dark:text-slate-300">
-            Step off St. Paul’s Lane and you’re instantly on land gifted by St. Paul’s Anglican Church for the whole community. The 27 acres stretch almost two kilometres from the heritage churchyard to Brine Lake with wetlands, yellow birch groves, and trail stops that invite curious visitors and lifelong nature lovers alike.
+            Step off St. Paul&apos;s Lane and you&apos;re instantly on land
+            gifted by St. Paul&apos;s Anglican Church for the whole community.
+            The 27 acres stretch almost two kilometres from the heritage
+            churchyard to Brine Lake with wetlands, yellow birch groves, and
+            trail stops that invite curious visitors and lifelong nature lovers
+            alike.
           </p>
           <div className="grid gap-2 text-xs text-slate-500 dark:text-slate-400 sm:grid-cols-2">
             <div>
-              <strong>Trailhead:</strong> Behind St. Paul’s Anglican Church, 71 St. Pauls Lane, French Village
+              <strong>Trailhead:</strong> Behind St. Paul&apos;s Anglican
+              Church, 71 St. Pauls Lane, French Village
             </div>
           </div>
+
+          {/* AUDIO CONTROLS: HERO SECTION */}
+          <div className="flex flex-wrap gap-3 pt-2">
+            <button
+              type="button"
+              onClick={() =>
+                speakText(
+                  "About the Conservation Woodland. " +
+                    "French Village Conservation Woodland is the forest family behind Saint Paul's Church. " +
+                    "Step off Saint Paul's Lane and you are instantly on land gifted by Saint Paul's Anglican Church for the whole community. " +
+                    "The twenty-seven acres stretch almost two kilometres from the heritage churchyard to Brine Lake, " +
+                    "with wetlands, yellow birch groves, and trail stops that invite curious visitors and lifelong nature lovers alike. " +
+                    "Trailhead: behind Saint Paul's Anglican Church, seventy one Saint Pauls Lane, French Village."
+                )
+              }
+              className="inline-flex items-center rounded-full px-4 py-2 text-sm font-medium bg-emerald-600 text-white shadow hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900"
+            >
+              Play Audio
+            </button>
+
+            <button
+              type="button"
+              onClick={stopSpeech}
+              className="inline-flex items-center rounded-full px-4 py-2 text-sm font-medium bg-red-600 text-white shadow hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900"
+            >
+              Stop Audio
+            </button>
+          </div>
+
           <div className="flex flex-wrap gap-3 pt-1">
             <Link
               to="/sitemap"
@@ -161,7 +300,11 @@ export default function About() {
         </div>
         <div className="flex items-center gap-4 lg:flex-col">
           <figure className="mt-6 w-full overflow-hidden rounded-3xl border border-white/40 shadow-inner shadow-slate-900/10 transition hover:-translate-y-1 hover:shadow-xl hover:shadow-emerald-500/10 dark:border-slate-700/60 sm:mx-auto md:mt-8 lg:mt-0 lg:w-[28rem] xl:w-[32rem]">
-            <img src={churchSketchImage} alt="Historic sketch of St. Paul's Anglican Church" className="h-full w-full object-cover" />
+            <img
+              src={churchSketchImage}
+              alt="Historic sketch of St. Paul's Anglican Church"
+              className="h-full w-full object-cover"
+            />
           </figure>
         </div>
       </section>
@@ -175,27 +318,78 @@ export default function About() {
             <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-xl border border-white/60 bg-white/80 shadow-inner shadow-slate-900/5 dark:border-slate-600/60 dark:bg-slate-900/60">
               {icon}
             </div>
-            <h2 className="text-lg font-semibold text-slate-800 dark:text-slate-100">{title}</h2>
-            <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">{text}</p>
+            <h2 className="text-lg font-semibold text-slate-800 dark:text-slate-100">
+              {title}
+            </h2>
+            <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">
+              {text}
+            </p>
           </article>
         ))}
       </section>
 
+      {/* WHY THIS WOODLAND MATTERS */}
       <section className={`${glassPanel} grid gap-6 md:grid-cols-2`}>
         <div className="space-y-4">
           <h2 className="text-2xl font-semibold">Why this woodland matters</h2>
           <p className="text-sm text-slate-600 dark:text-slate-300">
-            The French Village Conservation Woodland is a living classroom, a playground without swings, and a peaceful memorial all at once. Volunteers care for the forest so neighbours can learn about lichens, families can walk together, and elders can find quiet remembering spaces.
+            The French Village Conservation Woodland is a living classroom, a
+            playground without swings, and a peaceful memorial all at once.
+            Volunteers care for the forest so neighbours can learn about
+            lichens, families can walk together, and elders can find quiet
+            remembering spaces.
           </p>
           <p className="text-sm text-slate-600 dark:text-slate-300">
-            A memorial stone beside the shoreline honours the Brine family, whose name lives on through Brine Lake and the traditions they helped establish in French Village.
+            A memorial stone beside the shoreline honours the Brine family,
+            whose name lives on through Brine Lake and the traditions they
+            helped establish in French Village.
           </p>
           <p className="text-sm text-slate-600 dark:text-slate-300">
-            Halifax Regional Council’s Item 4 Information Report (May 9, 2023) celebrated the site’s ecological value and supported the request to include the woodland in Nova Scotia’s Protected Areas Registry. It confirmed the path toward a conservation easement that honours the church’s donation.
+            Halifax Regional Council’s Item 4 Information Report (May 9, 2023)
+            celebrated the site’s ecological value and supported the request to
+            include the woodland in Nova Scotia’s Protected Areas Registry. It
+            confirmed the path toward a conservation easement that honours the
+            church’s donation.
           </p>
           <p className="text-sm text-slate-600 dark:text-slate-300">
-            With partners like local schools, nature trusts, and the Green Burial Society of Canada, the woodland is preparing to become the first urban certified green burial conservation cemetery in Canada—while still welcoming everyday adventures.
+            With partners like local schools, nature trusts, and the Green
+            Burial Society of Canada, the woodland is preparing to become the
+            first urban certified green burial conservation cemetery in
+            Canada—while still welcoming everyday adventures.
           </p>
+
+          {/* AUDIO CONTROLS: WHY THIS WOODLAND MATTERS */}
+          <div className="flex flex-wrap gap-3 pt-2">
+            <button
+              type="button"
+              onClick={() =>
+                speakText(
+                  "Why this woodland matters. " +
+                    "The French Village Conservation Woodland is a living classroom, a playground without swings, and a peaceful memorial all at once. " +
+                    "Volunteers care for the forest so neighbours can learn about lichens, families can walk together, and elders can find quiet remembering spaces. " +
+                    "A memorial stone beside the shoreline honours the Brine family, whose name lives on through Brine Lake and the traditions they helped establish in French Village. " +
+                    "Halifax Regional Council's Item 4 Information Report, May ninth twenty twenty-three, celebrated the site's ecological value " +
+                    "and supported the request to include the woodland in Nova Scotia's Protected Areas Registry. " +
+                    "It confirmed the path toward a conservation easement that honours the church's donation. " +
+                    "With partners like local schools, nature trusts, and the Green Burial Society of Canada, " +
+                    "the woodland is preparing to become the first urban certified green burial conservation cemetery in Canada, " +
+                    "while still welcoming everyday adventures."
+                )
+              }
+              className="inline-flex items-center rounded-full px-4 py-2 text-sm font-medium bg-emerald-600 text-white shadow hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900"
+            >
+              Play Section Audio
+            </button>
+
+            <button
+              type="button"
+              onClick={stopSpeech}
+              className="inline-flex items-center rounded-full px-4 py-2 text-sm font-medium bg-red-600 text-white shadow hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900"
+            >
+              Stop Audio
+            </button>
+          </div>
+
           <div className="pt-2">
             <Link
               to="#natural-burial"
@@ -207,14 +401,19 @@ export default function About() {
           </div>
         </div>
         <figure className="overflow-hidden rounded-2xl border border-white/40 shadow-inner shadow-slate-900/10 dark:border-slate-700/60">
-          <img src={donationImage} alt="Historic stones marking the conservation donation" className="h-full w-full object-cover" />
+          <img
+            src={donationImage}
+            alt="Historic stones marking the conservation donation"
+            className="h-full w-full object-cover"
+          />
         </figure>
       </section>
 
       <section className={`${glassPanel} space-y-4`}>
         <h2 className="text-2xl font-semibold">Story steps timeline</h2>
         <p className="text-sm text-slate-600 dark:text-slate-300">
-          Follow the milestones that brought the woodland from churchyard trail to protected community treasure:
+          Follow the milestones that brought the woodland from churchyard trail
+          to protected community treasure:
         </p>
         <div className="grid gap-4 md:grid-cols-5">
           {timeline.map(({ year, title, body }) => (
@@ -222,18 +421,28 @@ export default function About() {
               key={year}
               className="group rounded-2xl border border-white/40 bg-white/70 p-4 shadow-inner shadow-slate-900/5 transition hover:-translate-y-1 hover:shadow-lg hover:shadow-sky-500/10 dark:border-slate-700/60 dark:bg-slate-900/55"
             >
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-500 dark:text-emerald-300">{year}</p>
-              <h3 className="mt-2 text-base font-semibold text-slate-800 dark:text-slate-100">{title}</h3>
-              <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">{body}</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-500 dark:text-emerald-300">
+                {year}
+              </p>
+              <h3 className="mt-2 text-base font-semibold text-slate-800 dark:text-slate-100">
+                {title}
+              </h3>
+              <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">
+                {body}
+              </p>
             </article>
           ))}
         </div>
       </section>
 
       <section className={`${glassPanel} space-y-6`}>
-        <h2 className="text-2xl font-semibold">Choose your own woodland adventure</h2>
+        <h2 className="text-2xl font-semibold">
+          Choose your own woodland adventure
+        </h2>
         <p className="text-sm text-slate-600 dark:text-slate-300">
-          Every stop along the loop feels like a storybook page. Use these images to spark scavenger hunts or plan themed visits for classrooms, clubs, or family outings.
+          Every stop along the loop feels like a storybook page. Use these
+          images to spark scavenger hunts or plan themed visits for classrooms,
+          clubs, or family outings.
         </p>
         <div className="grid gap-4 md:grid-cols-2">
           {photoStories.map(({ image, title, caption }) => (
@@ -241,14 +450,26 @@ export default function About() {
               key={title}
               className="overflow-hidden rounded-2xl border border-white/40 bg-white/60 shadow-inner shadow-slate-900/10 transition hover:-translate-y-1 hover:shadow-lg hover:shadow-amber-500/10 dark:border-slate-700/60 dark:bg-slate-900/55"
             >
-              <img src={image} alt={title} className="h-56 w-full object-cover sm:h-64" />
+              <img
+                src={image}
+                alt={title}
+                className="h-56 w-full object-cover sm:h-64"
+              />
               <figcaption className="space-y-3 px-5 py-4">
                 <div>
                   <h3 className="text-lg font-semibold">{title}</h3>
-                  <p className="text-sm text-slate-600 dark:text-slate-300">{caption}</p>
+                  <p className="text-sm text-slate-600 dark:text-slate-300">
+                    {caption}
+                  </p>
                 </div>
                 <div className="flex flex-wrap gap-3">
-                  {["Trailhead Warm-Up", "Labyrinth of Quiet Steps", "Listening Telephone", "Farmhouse Foundations", "Historic Wells"].includes(title) ? (
+                  {[
+                    "Trailhead Warm-Up",
+                    "Labyrinth of Quiet Steps",
+                    "Listening Telephone",
+                    "Farmhouse Foundations",
+                    "Historic Wells",
+                  ].includes(title) ? (
                     <Link
                       to="/sitemap"
                       className="inline-flex items-center gap-2 text-xs font-semibold text-slate-700 transition hover:underline dark:text-slate-200"
@@ -276,7 +497,8 @@ export default function About() {
       <section className={`${glassPanel} space-y-4`}>
         <h2 className="text-2xl font-semibold">Trail discovery prompts</h2>
         <p className="text-sm text-slate-600 dark:text-slate-300">
-          Turn every visit into a mini mission and share your discoveries with neighbours and friends.
+          Turn every visit into a mini mission and share your discoveries with
+          neighbours and friends.
         </p>
         <div className="grid gap-3 text-sm text-slate-600 dark:text-slate-300 md:grid-cols-2">
           {trailDiscoveryIdeas.map((idea) => (
@@ -293,22 +515,35 @@ export default function About() {
 
       <section className={`${glassPanel} grid gap-6 md:grid-cols-2`}>
         <figure className="order-last overflow-hidden rounded-2xl border border-white/40 shadow-inner shadow-slate-900/10 dark:border-slate-700/60 md:order-first">
-          <img src={lakeshoreImage} alt="Brine Lake lookout at the end of the woodland trail" className="h-full w-full object-cover" />
+          <img
+            src={lakeshoreImage}
+            alt="Brine Lake lookout at the end of the woodland trail"
+            className="h-full w-full object-cover"
+          />
         </figure>
         <div className="space-y-4">
           <h2 className="text-2xl font-semibold">How we keep the promise</h2>
           <p className="text-sm text-slate-600 dark:text-slate-300">
-            Volunteers coordinate with Halifax Regional Municipality staff, conservation partners, and the Green Burial Society of Canada to protect the woodland through a conservation easement. This legal promise keeps the land natural while supporting green burial certification.
+            Volunteers coordinate with Halifax Regional Municipality staff,
+            conservation partners, and the Green Burial Society of Canada to
+            protect the woodland through a conservation easement. This legal
+            promise keeps the land natural while supporting green burial
+            certification.
           </p>
           <p className="text-sm text-slate-600 dark:text-slate-300">
-            Want to help? Join monthly trail care events, offer nature lessons, or support the conservation fund. Every hour shared on the trail keeps the woodland thriving for future generations.
+            Want to help? Join monthly trail care events, offer nature lessons,
+            or support the conservation fund. Every hour shared on the trail
+            keeps the woodland thriving for future generations.
           </p>
           <div className="grid gap-2 text-sm text-slate-600 dark:text-slate-300">
             <div className="flex items-start gap-2">
               <FaLeaf className="mt-1 text-emerald-500" />
               <span>
                 Share stewardship ideas or request a guided tour through our{" "}
-                <Link to="/contact" className="underline decoration-emerald-400 decoration-2 underline-offset-4">
+                <Link
+                  to="/contact"
+                  className="underline decoration-emerald-400 decoration-2 underline-offset-4"
+                >
                   contact page
                 </Link>
                 .

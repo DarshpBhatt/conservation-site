@@ -10,17 +10,105 @@ import {
   FaPeace,
 } from "react-icons/fa";
 import Footer from "./Footer";
+import * as SpeechSDK from "microsoft-cognitiveservices-speech-sdk";
 
 const glassPanel =
   "rounded-3xl border border-white/40 bg-white/60 p-6 shadow-lg shadow-slate-900/10 backdrop-blur-2xl transition-colors duration-300 dark:border-slate-700/60 dark:bg-slate-900/55";
 
 export default function NaturalBurial() {
+  // ---------- AUDIO STATE (HEADER ONLY) ----------
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const synthesizerRef = useRef(null);
+  const playerRef = useRef(null);
+
+  useEffect(() => {
+    const speechKey = import.meta.env.VITE_AZURE_SPEECH_KEY;
+    const speechRegion = import.meta.env.VITE_AZURE_REGION;
+
+    if (!speechKey || !speechRegion) {
+      console.warn("Azure Speech key/region are missing in .env");
+      return;
+    }
+
+    const speechConfig = SpeechSDK.SpeechConfig.fromSubscription(
+      speechKey,
+      speechRegion
+    );
+    speechConfig.speechSynthesisVoiceName = "en-US-JennyNeural";
+
+    const player = new SpeechSDK.SpeakerAudioDestination();
+    const audioConfig = SpeechSDK.AudioConfig.fromSpeakerOutput(player);
+
+    const synthesizer = new SpeechSDK.SpeechSynthesizer(
+      speechConfig,
+      audioConfig
+    );
+
+    synthesizerRef.current = synthesizer;
+    playerRef.current = player;
+
+    return () => {
+      if (synthesizerRef.current) synthesizerRef.current.close();
+      synthesizerRef.current = null;
+      playerRef.current = null;
+    };
+  }, []);
+
+  const playHeaderAudio = () => {
+    const synthesizer = synthesizerRef.current;
+    const player = playerRef.current;
+    if (!synthesizer) return;
+
+    const text =
+      "Natural burial is a simple, Earth friendly way to be laid to rest. " +
+      "There is no concrete, no metal casket, and no heavy use of chemicals. " +
+      "The body returns to the land in a natural way. " +
+      "The burial space looks and feels like part of the forest, not like a normal city cemetery. " +
+      "The goal is to protect the land and keep it alive for the future. " +
+      "At the Saint Margaret's Bay Woodland Conservation Site, the idea is to make a calm place " +
+      "that respects people, and also respects nature.";
+
+    if (player) player.resume();
+
+    setIsSpeaking(true);
+    synthesizer.speakTextAsync(
+      text,
+      () => setIsSpeaking(false),
+      (err) => {
+        console.error("Speech error:", err);
+        setIsSpeaking(false);
+      }
+    );
+  };
+
+  const stopHeaderAudio = () => {
+    const synthesizer = synthesizerRef.current;
+    const player = playerRef.current;
+
+    if (player) player.pause();
+
+    if (!synthesizer) {
+      setIsSpeaking(false);
+      return;
+    }
+
+    synthesizer.stopSpeakingAsync(
+      () => setIsSpeaking(false),
+      (err) => {
+        console.error("Stop speaking error:", err);
+        setIsSpeaking(false);
+      }
+    );
+  };
+  // ---------- END AUDIO ----------
+
   const cards = [
     {
       title: "Helping Nature",
       icon: <FaLeaf className="text-emerald-500 text-3xl" />,
       img: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800&h=600&fit=crop",
-      description: "Natural burial does not use harmful chemicals. Wood, cloth, and other soft materials are used instead of metal and plastic. The body and the coffin slowly go back into the soil. This feeds the ground in a safe way. Plants, trees, and tiny life in the earth can grow strong here.",
+      description:
+        "Natural burial does not use harmful chemicals. Wood, cloth, and other soft materials are used instead of metal and plastic. The body and the coffin slowly go back into the soil. This feeds the ground in a safe way. Plants, trees, and tiny life in the earth can grow strong here.",
       extraNote:
         "This is about caring for the land, not only for today, but for many years after.",
     },
@@ -28,17 +116,17 @@ export default function NaturalBurial() {
       title: "The Forest in St. Margaret's Bay",
       icon: <FaTree className="text-emerald-500 text-3xl" />,
       img: "https://images.unsplash.com/photo-1448375240586-882707db888b?w=800&h=600&fit=crop",
-      description: "This woodland near St. Margaret's Bay has tall trees, moss, and quiet trails. The natural burial area is part of this place, not separate from it. When people are laid to rest here, the forest is not damaged. Instead, the trees and plants are protected.",
+      description:
+        "This woodland near St. Margaret's Bay has tall trees, moss, and quiet trails. The natural burial area is part of this place, not separate from it. When people are laid to rest here, the forest is not damaged. Instead, the trees and plants are protected.",
       extraNote:
         "The site is meant to stay wild, not turn into roads and stone walls.",
     },
     {
       title: "A Peaceful Resting Place",
-      icon: (
-        <FaFeatherAlt className="text-emerald-500 text-3xl" />
-      ),
+      icon: <FaFeatherAlt className="text-emerald-500 text-3xl" />,
       img: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&h=600&fit=crop",
-      description: "Some people want a resting place that feels warm, soft, and close to nature. Natural burial does not feel like cement and metal. It feels like sunlight through trees, like wind in the leaves, like being part of the land again.",
+      description:
+        "Some people want a resting place that feels warm, soft, and close to nature. Natural burial does not feel like cement and metal. It feels like sunlight through trees, like wind in the leaves, like being part of the land again.",
       extraNote:
         "It is quiet. It is respectful. It is kind to the Earth and kind to people.",
     },
@@ -57,9 +145,7 @@ export default function NaturalBurial() {
     },
     {
       title: "Helps the Community",
-      icon: (
-        <FaHandsHelping className="text-emerald-500 text-3xl" />
-      ),
+      icon: <FaHandsHelping className="text-emerald-500 text-3xl" />,
       text: "This kind of burial can support local conservation. The land can stay safe instead of being sold and changed.",
     },
   ];
@@ -67,7 +153,9 @@ export default function NaturalBurial() {
   return (
     <div className="flex flex-col gap-8 text-slate-800 dark:text-slate-100">
       {/* HEADER SECTION */}
-      <header className={`${glassPanel} flex flex-col gap-5 md:flex-row md:items-center md:justify-between`}>
+      <header
+        className={`${glassPanel} flex flex-col gap-5 md:flex-row md:items-center md:justify-between`}
+      >
         <div>
           <h1 className="text-2xl font-semibold md:text-3xl">
             Natural Burial
@@ -78,9 +166,28 @@ export default function NaturalBurial() {
             The body returns to the land in a natural way. The burial space looks
             and feels like part of the forest, not like a normal city cemetery.
             The goal is to protect the land and keep it alive for the future. At
-            the St. Margaret's Bay Woodland Conservation Site, the idea is to make
+            the St. Margaret&apos;s Bay Woodland Conservation Site, the idea is to make
             a calm place that respects people, and also respects nature.
           </p>
+
+          {/* AUDIO BUTTONS */}
+          <div className="flex gap-3 mt-4">
+            <button
+              type="button"
+              onClick={playHeaderAudio}
+              className="inline-flex items-center rounded-full px-4 py-2 text-sm font-medium bg-emerald-600 text-white shadow hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900"
+            >
+              Play Audio
+            </button>
+
+            <button
+              type="button"
+              onClick={stopHeaderAudio}
+              className="inline-flex items-center rounded-full px-4 py-2 text-sm font-medium bg-red-600 text-white shadow hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900"
+            >
+              Stop Audio
+            </button>
+          </div>
         </div>
       </header>
 
@@ -124,7 +231,10 @@ export default function NaturalBurial() {
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {benefits.map((b, i) => (
-            <div key={i} className="text-center flex flex-col items-center px-4">
+            <div
+              key={i}
+              className="text-center flex flex-col items-center px-4"
+            >
               <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-white/50 bg-white/70 shadow-inner shadow-slate-900/10 dark:border-slate-600/60 dark:bg-slate-900/60 mb-3">
                 {b.icon}
               </div>
@@ -149,4 +259,3 @@ export default function NaturalBurial() {
     </div>
   );
 }
-

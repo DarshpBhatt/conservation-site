@@ -1,9 +1,16 @@
 // Purpose: To display the Contact section of the Woodland Conservation website
 
-import React, { useState } from "react";
-import { FaPhone, FaEnvelope, FaMapMarkerAlt, FaFacebook, FaInstagram } from "react-icons/fa";
+import React, { useState, useRef, useEffect } from "react";
+import {
+  FaPhone,
+  FaEnvelope,
+  FaMapMarkerAlt,
+  FaFacebook,
+  FaInstagram,
+} from "react-icons/fa";
 import { FaXTwitter } from "react-icons/fa6";
 import Footer from "./Footer";
+import * as SpeechSDK from "microsoft-cognitiveservices-speech-sdk";
 
 const Contact = () => {
   const [contactReason, setContactReason] = useState("");
@@ -11,14 +18,117 @@ const Contact = () => {
   const glassPanel =
     "rounded-3xl border border-white/40 bg-white/60 p-6 shadow-lg shadow-slate-900/10 backdrop-blur-2xl transition-colors duration-300 dark:border-slate-700/60 dark:bg-slate-900/55";
 
+  // ---------- AUDIO STATE (HEADER ONLY) ----------
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const synthesizerRef = useRef(null);
+  const playerRef = useRef(null);
+
+  useEffect(() => {
+    const speechKey = import.meta.env.VITE_AZURE_SPEECH_KEY;
+    const speechRegion = import.meta.env.VITE_AZURE_REGION;
+
+    if (!speechKey || !speechRegion) {
+      console.warn("Azure Speech key/region are missing in .env");
+      return;
+    }
+
+    const speechConfig = SpeechSDK.SpeechConfig.fromSubscription(
+      speechKey,
+      speechRegion
+    );
+    speechConfig.speechSynthesisVoiceName = "en-US-JennyNeural";
+
+    const player = new SpeechSDK.SpeakerAudioDestination();
+    const audioConfig = SpeechSDK.AudioConfig.fromSpeakerOutput(player);
+
+    const synthesizer = new SpeechSDK.SpeechSynthesizer(
+      speechConfig,
+      audioConfig
+    );
+
+    synthesizerRef.current = synthesizer;
+    playerRef.current = player;
+
+    return () => {
+      if (synthesizerRef.current) synthesizerRef.current.close();
+      synthesizerRef.current = null;
+      playerRef.current = null;
+    };
+  }, []);
+
+  const playHeaderAudio = () => {
+    const synthesizer = synthesizerRef.current;
+    const player = playerRef.current;
+    if (!synthesizer) return;
+
+    const text =
+      "Get in touch. We would love to hear from you. " +
+      "Use the form below or connect with us through our social channels " +
+      "to share feedback, volunteer, or plan a visit.";
+
+    if (player) {
+      player.resume();
+    }
+
+    setIsSpeaking(true);
+    synthesizer.speakTextAsync(
+      text,
+      () => setIsSpeaking(false),
+      (err) => {
+        console.error("Speech error:", err);
+        setIsSpeaking(false);
+      }
+    );
+  };
+
+  const stopHeaderAudio = () => {
+    const synthesizer = synthesizerRef.current;
+    const player = playerRef.current;
+
+    if (player) player.pause();
+
+    if (!synthesizer) {
+      setIsSpeaking(false);
+      return;
+    }
+
+    synthesizer.stopSpeakingAsync(
+      () => setIsSpeaking(false),
+      (err) => {
+        console.error("Stop speaking error:", err);
+        setIsSpeaking(false);
+      }
+    );
+  };
+  // ---------- END AUDIO ----------
+
   return (
     <div className="flex flex-col gap-8 text-slate-800 dark:text-slate-100">
       <header className={`${glassPanel} flex flex-col gap-5 md:flex-row md:items-center md:justify-between`}>
         <div>
           <h1 className="text-2xl font-semibold md:text-3xl">Get in touch</h1>
           <p className="mt-2 max-w-2xl text-sm text-slate-600 dark:text-slate-300">
-            We would love to hear from you. Use the form below or connect with us through our social channels to share feedback, volunteer, or plan a visit.
+            We would love to hear from you. Use the form below or connect with us through our
+            social channels to share feedback, volunteer, or plan a visit.
           </p>
+
+          {/* AUDIO BUTTONS */}
+          <div className="flex gap-3 mt-4">
+            <button
+              type="button"
+              onClick={playHeaderAudio}
+              className="px-4 py-2 rounded-full bg-emerald-600 text-white text-sm font-medium shadow hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900"
+            >
+              Play Audio
+            </button>
+            <button
+              type="button"
+              onClick={stopHeaderAudio}
+              className="px-4 py-2 rounded-full bg-red-600 text-white text-sm font-medium shadow hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900"
+            >
+              Stop Audio
+            </button>
+          </div>
         </div>
       </header>
 
@@ -31,18 +141,19 @@ const Contact = () => {
                 id: "name",
                 type: "text",
                 placeholder: "Your name",
-                prompt: "Please enter a name",
               },
               {
                 label: "Email",
                 id: "email",
                 type: "email",
                 placeholder: "you@example.com",
-                prompt: "Please enter an email address",
               },
-            ].map(({ label, id, type, placeholder, prompt }) => (
+            ].map(({ label, id, type, placeholder }) => (
               <div key={id} className="space-y-2">
-                <label htmlFor={id} className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-300">
+                <label
+                  htmlFor={id}
+                  className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-300"
+                >
                   {label}
                 </label>
                 <input
@@ -56,7 +167,10 @@ const Contact = () => {
           </div>
 
           <div className="space-y-2">
-            <label htmlFor="reason" className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-300">
+            <label
+              htmlFor="reason"
+              className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-300"
+            >
               Reason for Contact
             </label>
             <select
@@ -76,7 +190,10 @@ const Contact = () => {
           </div>
 
           <div className="space-y-2">
-            <label htmlFor="message" className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-300">
+            <label
+              htmlFor="message"
+              className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-300"
+            >
               Message
             </label>
             <textarea

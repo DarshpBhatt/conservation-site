@@ -1,10 +1,11 @@
 // Purpose: To display the Homepage (landing page) of the Woodland Conservation website
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import bannerImage from "../assets/homepage-banner.jpg";
 import { Link } from "react-router-dom";
 import { FaTree, FaCamera, FaMapMarkedAlt } from "react-icons/fa";
 import { BsArrowRightCircle, BsArrowUpRight } from "react-icons/bs";
 import Footer from "./Footer";
+import * as SpeechSDK from "microsoft-cognitiveservices-speech-sdk";
 
 const glassPanel =
   "rounded-3xl border border-white/40 bg-white/60 p-6 shadow-lg shadow-slate-900/10 backdrop-blur-2xl transition-colors duration-300 dark:border-slate-700/60 dark:bg-slate-900/55";
@@ -34,21 +35,136 @@ const coreTiles = [
 ];
 
 const Homepage = () => {
+  // ---- TEXT TO SPEECH (Azure) FOR HERO SECTION ----
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const synthesizerRef = useRef(null);
+  const playerRef = useRef(null);
+
+  useEffect(() => {
+    const speechKey = import.meta.env.VITE_AZURE_SPEECH_KEY;
+    const speechRegion = import.meta.env.VITE_AZURE_REGION;
+
+    if (!speechKey || !speechRegion) {
+      console.warn("Azure Speech key/region are missing in .env");
+      return;
+    }
+
+    const speechConfig = SpeechSDK.SpeechConfig.fromSubscription(
+      speechKey,
+      speechRegion
+    );
+    speechConfig.speechSynthesisVoiceName = "en-US-JennyNeural"; // choose your neural voice
+
+    const player = new SpeechSDK.SpeakerAudioDestination();
+    const audioConfig = SpeechSDK.AudioConfig.fromSpeakerOutput(player);
+
+    const synthesizer = new SpeechSDK.SpeechSynthesizer(
+      speechConfig,
+      audioConfig
+    );
+
+    synthesizerRef.current = synthesizer;
+    playerRef.current = player;
+
+    return () => {
+      if (synthesizerRef.current) {
+        synthesizerRef.current.close();
+      }
+      synthesizerRef.current = null;
+      playerRef.current = null;
+    };
+  }, []);
+
+  const playHeroAudio = () => {
+    const synthesizer = synthesizerRef.current;
+    const player = playerRef.current;
+    if (!synthesizer) return;
+
+    const text =
+      "Saint Margaret's Bay Area Woodland. " +
+      "A community forest that keeps local history and coastal birch standing strong. " +
+      "Welcome to the French Village Conservation Woodland at seventy one Saint Pauls Lane—twenty-seven acres of protected forest and wetlands. " +
+      "Walk the one-way trail to eight simple stops, from the exercise bar to the labyrinth. " +
+      "Discover community stories along the way, and return the same route as the forest soundtrack changes around you.";
+
+    if (player) {
+      player.resume();
+    }
+
+    setIsSpeaking(true);
+    synthesizer.speakTextAsync(
+      text,
+      () => {
+        setIsSpeaking(false);
+      },
+      (err) => {
+        console.error("Speech error:", err);
+        setIsSpeaking(false);
+      }
+    );
+  };
+
+  const stopHeroAudio = () => {
+    const synthesizer = synthesizerRef.current;
+    const player = playerRef.current;
+
+    if (player) {
+      player.pause(); // immediate stop of local audio
+    }
+
+    if (!synthesizer) {
+      setIsSpeaking(false);
+      return;
+    }
+
+    synthesizer.stopSpeakingAsync(
+      () => {
+        setIsSpeaking(false);
+      },
+      (err) => {
+        console.error("Stop speaking error:", err);
+        setIsSpeaking(false);
+      }
+    );
+  };
+  // ---- END TEXT TO SPEECH ----
 
   return (
     <div className="flex flex-col gap-8 text-slate-800 dark:text-slate-100">
       <header className={`${glassPanel} flex flex-col gap-5 md:flex-row md:items-center md:justify-between`}>
         <div className="flex-1 space-y-4">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-600 dark:text-emerald-300">
-            St. Margaret's Bay Area Woodland
+            St. Margaret&apos;s Bay Area Woodland
           </p>
           <h1 className="text-2xl font-semibold md:text-3xl">
             A community forest that keeps local history and coastal birch standing strong.
           </h1>
           <p className="max-w-xl text-sm text-slate-600 dark:text-slate-300">
-            Welcome to the French Village Conservation Woodland at 71 St. Pauls Lane—27 acres of protected forest and wetlands. Walk the one-way trail to eight simple stops, from the exercise bar to the labyrinth, discover community stories along the way, and return the same route as the forest soundtrack changes around you.
+            Welcome to the French Village Conservation Woodland at 71 St. Pauls Lane—27 acres of protected forest and wetlands.
+            Walk the one-way trail to eight simple stops, from the exercise bar to the labyrinth, discover community stories along
+            the way, and return the same route as the forest soundtrack changes around you.
           </p>
-          <div className="flex flex-wrap gap-3">
+
+          {/* AUDIO BUTTONS FOR HERO SECTION */}
+          <div className="flex flex-wrap gap-3 pt-1">
+            <button
+              type="button"
+              onClick={playHeroAudio}
+              className="inline-flex items-center rounded-full px-4 py-2 text-xs font-semibold bg-emerald-600 text-white shadow hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900"
+            >
+              Play Audio
+            </button>
+
+            <button
+              type="button"
+              onClick={stopHeroAudio}
+              className="inline-flex items-center rounded-full px-4 py-2 text-xs font-semibold bg-red-600 text-white shadow hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900"
+            >
+              Stop Audio
+            </button>
+          </div>
+
+          <div className="flex flex-wrap gap-3 pt-3">
             <Link
               to="/sitemap"
               className="flex items-center gap-2 rounded-full border border-white/60 bg-white/70 px-5 py-2 text-xs font-semibold text-slate-700 shadow-md shadow-slate-900/10 transition hover:bg-white/90 dark:border-slate-600/60 dark:bg-slate-900/60 dark:text-slate-200"

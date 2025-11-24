@@ -4,10 +4,12 @@ import React, { useState, useRef, useEffect } from "react";
 import { FaApple, FaLeaf } from "react-icons/fa";
 import { FaJar } from "react-icons/fa6";
 import Footer from "./Footer";
-import appleTreesImage from "../assets/Shop/Appletrees.jpg";
-import pinCherryImage from "../assets/Shop/Pin Cherry.jpg";
-import jamsImage from "../assets/Shop/Jams.jpg";
-import wildPearTreeImage from "../assets/Shop/wild pear tree.jpg";
+import * as SpeechSDK from "microsoft-cognitiveservices-speech-sdk";
+
+import appleTreesImage from "../assets/shop/Appletrees.jpg";
+import pinCherryImage from "../assets/shop/Pin Cherry.jpg";
+import jamsImage from "../assets/shop/Jams.jpg";
+import wildPearTreeImage from "../assets/shop/wild pear tree.jpg";
 
 const glassPanel =
   "rounded-3xl border border-white/40 bg-white/60 p-6 shadow-lg shadow-slate-900/10 backdrop-blur-2xl transition-colors duration-300 dark:border-slate-700/60 dark:bg-slate-900/55";
@@ -18,7 +20,8 @@ const shopItems = [
     title: "Apple Picking",
     icon: <FaApple className="text-emerald-500 text-3xl" />,
     image: appleTreesImage,
-    description: "Experience the joy of picking fresh wild apples from our conservation area. Discover the natural flavors of locally grown wild fruit in their natural habitat.",
+    description:
+      "Experience the joy of picking fresh wild apples from our conservation area. Discover the natural flavors of locally grown wild fruit in their natural habitat.",
     price: "$15 per basket",
     season: "Available September - October",
   },
@@ -27,7 +30,8 @@ const shopItems = [
     title: "Berry Picking",
     icon: <FaLeaf className="text-emerald-500 text-3xl" />,
     image: pinCherryImage,
-    description: "Pick your own fresh wild berries from our conservation area. Choose from wild blueberries, raspberries, and other native berries. Perfect for families and nature lovers.",
+    description:
+      "Pick your own fresh wild berries from our conservation area. Choose from wild blueberries, raspberries, and other native berries. Perfect for families and nature lovers.",
     price: "$12 per container",
     season: "Available July - August",
   },
@@ -36,7 +40,8 @@ const shopItems = [
     title: "Pear Picking",
     icon: <FaApple className="text-emerald-500 text-3xl" />,
     image: wildPearTreeImage,
-    description: "Experience the delight of picking fresh wild pears from our conservation area. Enjoy the unique flavor of naturally grown wild pears in their natural setting.",
+    description:
+      "Experience the delight of picking fresh wild pears from our conservation area. Enjoy the unique flavor of naturally grown wild pears in their natural setting.",
     price: "$15 per basket",
     season: "Available August - September",
   },
@@ -45,34 +50,141 @@ const shopItems = [
     title: "Homemade Jam",
     icon: <FaJar className="text-emerald-500 text-3xl" />,
     image: jamsImage,
-    description: "Handcrafted jams made from the fruits picked in our conservation area. Made with care using traditional recipes and natural ingredients.",
+    description:
+      "Handcrafted jams made from the fruits picked in our conservation area. Made with care using traditional recipes and natural ingredients.",
     price: "$8 per jar",
     season: "Available year-round",
   },
 ];
 
 export default function Shop() {
+  // AUDIO STATES
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const synthesizerRef = useRef(null);
+  const playerRef = useRef(null);
+
+  // INIT AZURE TTS
+  useEffect(() => {
+    const speechKey = import.meta.env.VITE_AZURE_SPEECH_KEY;
+    const speechRegion = import.meta.env.VITE_AZURE_REGION;
+
+    if (!speechKey || !speechRegion) {
+      console.warn("Azure Speech key/region missing");
+      return;
+    }
+
+    const speechConfig = SpeechSDK.SpeechConfig.fromSubscription(
+      speechKey,
+      speechRegion
+    );
+    speechConfig.speechSynthesisVoiceName = "en-US-JennyNeural";
+
+    const player = new SpeechSDK.SpeakerAudioDestination();
+    const audioConfig = SpeechSDK.AudioConfig.fromSpeakerOutput(player);
+
+    const synthesizer = new SpeechSDK.SpeechSynthesizer(
+      speechConfig,
+      audioConfig
+    );
+
+    synthesizerRef.current = synthesizer;
+    playerRef.current = player;
+
+    return () => {
+      if (synthesizerRef.current) synthesizerRef.current.close();
+      synthesizerRef.current = null;
+      playerRef.current = null;
+    };
+  }, []);
+
+  // PLAY AUDIO
+  const playHeaderAudio = () => {
+    const synthesizer = synthesizerRef.current;
+    const player = playerRef.current;
+
+    if (!synthesizer) return;
+
+    const text =
+      "Welcome to the shop. Explore fresh produce and homemade goods from our conservation area. " +
+      "Pick your own apples, berries, and pears, or enjoy our handcrafted jams.";
+
+    if (player) player.resume();
+
+    setIsSpeaking(true);
+
+    synthesizer.speakTextAsync(
+      text,
+      () => setIsSpeaking(false),
+      (err) => {
+        console.error("Speech error:", err);
+        setIsSpeaking(false);
+      }
+    );
+  };
+
+  // STOP AUDIO
+  const stopHeaderAudio = () => {
+    const synthesizer = synthesizerRef.current;
+    const player = playerRef.current;
+
+    if (player) player.pause();
+
+    if (!synthesizer) {
+      setIsSpeaking(false);
+      return;
+    }
+
+    synthesizer.stopSpeakingAsync(
+      () => setIsSpeaking(false),
+      (err) => {
+        console.error("Stop speaking error:", err);
+        setIsSpeaking(false);
+      }
+    );
+  };
 
   return (
     <div className="flex flex-col gap-8 text-slate-800 dark:text-slate-100">
-      <header className={`${glassPanel} flex flex-col gap-5 md:flex-row md:items-center md:justify-between`}>
+      {/* HEADER WITH AUDIO */}
+      <header
+        className={`${glassPanel} flex flex-col gap-5 md:flex-row md:items-center md:justify-between`}
+      >
         <div>
-          <h1 className="text-2xl font-semibold md:text-3xl">
-            Shop
-          </h1>
+          <h1 className="text-2xl font-semibold md:text-3xl">Shop</h1>
+
           <p className="mt-2 max-w-2xl text-sm text-slate-600 dark:text-slate-300">
-            Discover fresh produce and homemade goods from our conservation area. Pick your own fruits or enjoy our handcrafted jams made with care.
+            Discover fresh produce and homemade goods from our conservation area.
+            Pick your own fruits or enjoy our handcrafted jams made with care.
           </p>
+
+          {/* AUDIO BUTTONS */}
+          <div className="flex gap-3 mt-4">
+            <button
+              type="button"
+              onClick={playHeaderAudio}
+              className="px-4 py-2 rounded-full bg-emerald-600 text-white text-sm font-medium shadow hover:bg-emerald-700"
+            >
+              Play Audio
+            </button>
+
+            <button
+              type="button"
+              onClick={stopHeaderAudio}
+              className="px-4 py-2 rounded-full bg-red-600 text-white text-sm font-medium shadow hover:bg-red-700"
+            >
+              Stop Audio
+            </button>
+          </div>
         </div>
       </header>
 
-      {/* SHOP ITEMS GRID */}
+      {/* SHOP GRID */}
       <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {shopItems.map((item) => (
           <article key={item.id} className={`${glassPanel} flex flex-col gap-4`}>
             <div className="relative w-full h-48 rounded-xl overflow-hidden">
-              <img 
-                src={item.image} 
+              <img
+                src={item.image}
                 alt={item.title}
                 className="w-full h-full object-cover"
               />
@@ -86,11 +198,9 @@ export default function Shop() {
             </div>
 
             <div className="mt-auto space-y-2 pt-2 border-t border-white/40 dark:border-slate-700/60">
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-semibold text-emerald-600 dark:text-emerald-300">
-                  {item.price}
-                </span>
-              </div>
+              <span className="text-sm font-semibold text-emerald-600 dark:text-emerald-300">
+                {item.price}
+              </span>
               <p className="text-xs text-slate-500 dark:text-slate-400">
                 {item.season}
               </p>
@@ -101,9 +211,7 @@ export default function Shop() {
 
       {/* INFO SECTION */}
       <section className={`${glassPanel}`}>
-        <h2 className="text-2xl font-semibold mb-4">
-          About Our Products
-        </h2>
+        <h2 className="text-2xl font-semibold mb-4">About Our Products</h2>
         <div className="space-y-4 text-sm text-slate-600 dark:text-slate-300">
           <p>
             All our products come from the St. Margaret's Bay Woodland Conservation Site. 
@@ -122,4 +230,3 @@ export default function Shop() {
     </div>
   );
 }
-
