@@ -6,10 +6,10 @@ import { FaJar } from "react-icons/fa6";
 import Footer from "./Footer";
 import * as SpeechSDK from "microsoft-cognitiveservices-speech-sdk";
 
-import appleTreesImage from "../assets/shop/Appletrees.jpg";
-import pinCherryImage from "../assets/shop/Pin Cherry.jpg";
-import jamsImage from "../assets/shop/Jams.jpg";
-import wildPearTreeImage from "../assets/shop/wild pear tree.jpg";
+import appleTreesImage from "../assets/Shop/Appletrees.jpg";
+import pinCherryImage from "../assets/Shop/Pin Cherry.jpg";
+import jamsImage from "../assets/Shop/Jams.jpg";
+import wildPearTreeImage from "../assets/Shop/wild pear tree.jpg";
 
 const glassPanel =
   "rounded-3xl border border-white/40 bg-white/60 p-6 shadow-lg shadow-slate-900/10 backdrop-blur-2xl transition-colors duration-300 dark:border-slate-700/60 dark:bg-slate-900/55";
