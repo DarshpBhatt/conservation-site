@@ -39,7 +39,11 @@ A modern, responsive website for the Woodland Conservation Area featuring intera
    npm install
    ```
 
-3. Create a `.env` file in the root directory with the following variables:
+3. Create a `.env` file in the root directory (copy from `.env.example`):
+   ```bash
+   cp .env.example .env
+   ```
+   Then fill in your actual API keys:
    ```
    VITE_AZURE_SPEECH_KEY=your_azure_speech_key
    VITE_AZURE_REGION=your_azure_region
@@ -100,24 +104,24 @@ The project is also configured for Netlify deployment via `netlify.toml`.
    - `VITE_AZURE_REGION` - Your Azure Speech Services region (e.g., `westus3`)
 3. Netlify will automatically detect the `netlify.toml` configuration and deploy
 
-**Note:** The weather widget uses Open-Meteo API which doesn't require an API key, so no additional configuration is needed for weather functionality.
+## Environment Variables
 
-<<<<<<< HEAD
+### Required API Keys
+
+**Azure Speech Services** (for text-to-speech features)
+- Get your keys from: https://portal.azure.com
+- Required variables: `VITE_AZURE_SPEECH_KEY`, `VITE_AZURE_REGION`
+
+### Local Development
+- Copy `.env.example` to `.env` and fill in your actual API keys
+- Never commit `.env` to version control (it's in `.gitignore`)
+
+### Production Deployment
+- **DO NOT** push your `.env` file to GitHub (security risk!)
+- Instead, configure environment variables in your hosting platform:
+  - **Netlify**: Dashboard → Site settings → Environment variables
+  - **Azure**: Configuration → Application settings
+
 ## License
 
 Private project - All rights reserved
-=======
-## Environment Variables
-
-The weather widget depends on the OpenWeather API.
-
-- A working public key is already provided (OpenWeather API key: `bd5e378503939ddaee76f12ad7a97608`) and bundled into `.env.example` plus `netlify.toml` so preview deployments stay functional.
-- For local work, copy `.env.example` to `.env.local` and adjust the key if you prefer to use your own credentials:
-
-```
-cp .env.example .env.local
-```
-
-- When running locally with Vite, restart the dev server after creating or updating the file so it can pick up the new value.
-- On Netlify (or any other host), define `VITE_OPENWEATHER_API_KEY` in the environment settings to override the default.
->>>>>>> afed99339a48712be9497c5e11b39e6e8c434e9b

@@ -82,23 +82,11 @@ const Contact = () => {
   };
 
   const stopHeaderAudio = () => {
-    const synthesizer = synthesizerRef.current;
     const player = playerRef.current;
 
     if (player) player.pause();
 
-    if (!synthesizer) {
-      setIsSpeaking(false);
-      return;
-    }
-
-    synthesizer.stopSpeakingAsync(
-      () => setIsSpeaking(false),
-      (err) => {
-        console.error("Stop speaking error:", err);
-        setIsSpeaking(false);
-      }
-    );
+    setIsSpeaking(false);
   };
   // ---------- END AUDIO ----------
 

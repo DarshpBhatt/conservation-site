@@ -66,10 +66,10 @@ function App() {
               aria-hidden="true"
               className="shrink-0"
               style={{
-                height: "calc(var(--nav-height, 5rem) + var(--nav-spacing, 1rem) + var(--nav-spacing, 1rem))",
+                height: "calc(var(--nav-height, 5rem) + 1rem)",
               }}
             />
-            <main className="flex flex-1 flex-col gap-8 px-4 py-24 sm:px-6 sm:py-28 lg:px-12 lg:py-24">
+            <main className="flex flex-1 flex-col gap-8 px-4 py-8 sm:px-6 lg:px-12">
               <Routes>
                 <Route path="/" element={<GlassPage><Homepage dark={dark} /></GlassPage>} />
                 <Route path="/about" element={<GlassPage><About /></GlassPage>} />

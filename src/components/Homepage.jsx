@@ -105,27 +105,13 @@ const Homepage = () => {
   };
 
   const stopHeroAudio = () => {
-    const synthesizer = synthesizerRef.current;
     const player = playerRef.current;
 
     if (player) {
       player.pause(); // immediate stop of local audio
     }
 
-    if (!synthesizer) {
-      setIsSpeaking(false);
-      return;
-    }
-
-    synthesizer.stopSpeakingAsync(
-      () => {
-        setIsSpeaking(false);
-      },
-      (err) => {
-        console.error("Stop speaking error:", err);
-        setIsSpeaking(false);
-      }
-    );
+    setIsSpeaking(false);
   };
   // ---- END TEXT TO SPEECH ----
 
