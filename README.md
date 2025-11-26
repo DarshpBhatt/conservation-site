@@ -1,74 +1,89 @@
-# Getting Started with Create React App
+# Woodland Conservation Area Website
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A modern, responsive website for the Woodland Conservation Area featuring interactive maps, weather widgets, photo galleries, and educational content about the conservation site.
 
-## Available Scripts
+## Features
 
-In the project directory, you can run:
+- Interactive trail map with geolocation
+- Real-time weather widget
+- Photo gallery with community uploads
+- Ecology education section
+- Natural burial information
+- Shop for conservation products
+- Dark mode support
+- Text-to-speech accessibility features
 
-### `npm start`
+## Tech Stack
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+- **React 18** - UI framework
+- **Vite** - Build tool and dev server
+- **React Router** - Client-side routing
+- **Leaflet** - Interactive maps
+- **Open-Meteo API** - Weather data
+- **Azure Cognitive Services** - Text-to-speech
+- **Tailwind CSS** - Styling
+- **Framer Motion** - Animations
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Getting Started
 
-### `npm test`
+### Prerequisites
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+- Node.js (v16 or higher)
+- npm or yarn
 
-### `npm run build`
+### Installation
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+1. Clone the repository
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+3. Create a `.env` file in the root directory with the following variables:
+   ```
+   VITE_AZURE_SPEECH_KEY=your_azure_speech_key
+   VITE_AZURE_REGION=your_azure_region
+   ```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+4. Start the development server:
+   ```bash
+   npm run dev
+   ```
 
-### `npm run eject`
+5. Open [http://localhost:5173](http://localhost:5173) in your browser
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+### Available Scripts
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run preview` - Preview production build
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+## Project Structure
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+```
+src/
+├── components/     # React components
+├── assets/         # Images and static assets
+├── data/           # JSON data files
+└── utils/          # Utility functions
+```
 
-## Learn More
+## Deployment
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+The project is configured for deployment on Azure Static Web Apps. The build output is in the `dist` folder after running `npm run build`.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+### Azure Static Web Apps Deployment
 
-### Code Splitting
+The project includes a GitHub Actions workflow (`.github/workflows/azure-static-web-apps-purple-field-0f81f6c10.yml`) that automatically builds and deploys to Azure Static Web Apps when changes are pushed to the `main` branch.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+**Configuration:**
+- Build command: `npm run build`
+- Output location: `dist`
+- SPA routing: Configured via `staticwebapp.config.json`
 
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-
-to-minify)
-
-### hosted on Azure
+### Hosted on Azure
 https://purple-field-0f81f6c10.3.azurestaticapps.net
+
+## License
+
+Private project - All rights reserved

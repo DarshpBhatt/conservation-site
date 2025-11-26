@@ -222,10 +222,6 @@ function sanitizePolygonCoords(poly) {
 }
 
 export default function Sitemap() {
-  /* ------- Debug logging ------- */
-  console.log("Sitemap: mapData loaded:", !!mapData);
-  console.log("Sitemap: mapData structure:", mapData ? Object.keys(mapData) : "No data");
-
   const [isMobile, setIsMobile] = useState(false);
   const [viewMode, setViewMode] = useState(VIEW_MODES.OVERVIEW);
   const [mapReady, setMapReady] = useState(false);
@@ -249,7 +245,6 @@ export default function Sitemap() {
   const siteBorder = useMemo(() => {
     const raw = mapData?.areas?.siteBorder || mapData?.siteBorder || mapData?.border || [];
     const cleaned = sanitizePolygonCoords(raw);
-    console.log("Sitemap: siteBorder coords:", cleaned.length);
     if (!cleaned.length && raw?.length) {
       console.warn("siteBorder provided but contained no valid [lat,lng] pairs.");
     }
