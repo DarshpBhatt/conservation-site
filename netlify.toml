@@ -2,6 +2,7 @@
   command = "npm run build"
   publish = "dist"
 
+# SPA routing - redirect all routes to index.html for client-side routing
 [[redirects]]
   from = "/*"
   to = "/index.html"
@@ -9,5 +10,6 @@
 
 [build.environment]
   NODE_VERSION = "20"
-  VITE_OPENWEATHER_API_KEY = "bd5e378503939ddaee76f12ad7a97608"
+  # Azure Speech Services keys (set in Netlify environment variables)
+  # VITE_AZURE_SPEECH_KEY and VITE_AZURE_REGION should be configured in Netlify dashboard
 
