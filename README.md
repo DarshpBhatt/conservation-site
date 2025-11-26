@@ -70,7 +70,7 @@ src/
 
 ## Deployment
 
-The project is configured for deployment on Azure Static Web Apps. The build output is in the `dist` folder after running `npm run build`.
+The project is configured for deployment on both Azure Static Web Apps and Netlify. The build output is in the `dist` folder after running `npm run build`.
 
 ### Azure Static Web Apps Deployment
 
@@ -81,8 +81,26 @@ The project includes a GitHub Actions workflow (`.github/workflows/azure-static-
 - Output location: `dist`
 - SPA routing: Configured via `staticwebapp.config.json`
 
-### Hosted on Azure
-https://purple-field-0f81f6c10.3.azurestaticapps.net
+**Hosted on Azure:** https://purple-field-0f81f6c10.3.azurestaticapps.net
+
+### Netlify Deployment
+
+The project is also configured for Netlify deployment via `netlify.toml`.
+
+**Configuration:**
+- Build command: `npm run build`
+- Publish directory: `dist`
+- SPA routing: Configured via `public/_redirects` file
+- Node version: 20
+
+**To deploy on Netlify:**
+1. Connect your GitHub repository to Netlify
+2. Set the following environment variables in Netlify dashboard:
+   - `VITE_AZURE_SPEECH_KEY` - Your Azure Speech Services key
+   - `VITE_AZURE_REGION` - Your Azure Speech Services region (e.g., `westus3`)
+3. Netlify will automatically detect the `netlify.toml` configuration and deploy
+
+**Note:** The weather widget uses Open-Meteo API which doesn't require an API key, so no additional configuration is needed for weather functionality.
 
 <<<<<<< HEAD
 ## License
