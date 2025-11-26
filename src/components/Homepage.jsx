@@ -8,7 +8,7 @@ import Footer from "./Footer";
 import * as SpeechSDK from "microsoft-cognitiveservices-speech-sdk";
 
 const glassPanel =
-  "rounded-3xl border border-white/40 bg-white/60 p-6 shadow-lg shadow-slate-900/10 backdrop-blur-2xl transition-colors duration-300 dark:border-slate-700/60 dark:bg-slate-900/55";
+  "rounded-[28px] border border-white/40 bg-white/40 p-6 shadow-lg shadow-slate-900/10 backdrop-blur-2xl backdrop-saturate-150 transition-colors duration-300 dark:border-slate-500/40 dark:bg-slate-900/40 dark:shadow-black/25";
 
 const coreTiles = [
   {
@@ -167,28 +167,28 @@ const Homepage = () => {
           <div className="flex flex-wrap gap-3 pt-3">
             <Link
               to="/sitemap"
-              className="flex items-center gap-2 rounded-full border border-white/60 bg-white/70 px-5 py-2 text-xs font-semibold text-slate-700 shadow-md shadow-slate-900/10 transition hover:bg-white/90 dark:border-slate-600/60 dark:bg-slate-900/60 dark:text-slate-200"
+              className="flex items-center gap-2 rounded-full border border-white/40 bg-white/40 px-5 py-2 text-xs font-semibold text-slate-700 shadow-md shadow-slate-900/10 transition hover:bg-white/60 dark:border-slate-500/40 dark:bg-slate-900/40 dark:text-slate-200 dark:hover:bg-slate-900/55"
             >
               Trail Map
               <FaMapMarkedAlt />
             </Link>
             <Link
               to="/about"
-              className="flex items-center gap-2 rounded-full border border-white/60 bg-white/70 px-5 py-2 text-xs font-semibold text-slate-700 shadow-md shadow-slate-900/10 transition hover:bg-white/90 dark:border-slate-600/60 dark:bg-slate-900/60 dark:text-slate-200"
+              className="flex items-center gap-2 rounded-full border border-white/40 bg-white/40 px-5 py-2 text-xs font-semibold text-slate-700 shadow-md shadow-slate-900/10 transition hover:bg-white/60 dark:border-slate-500/40 dark:bg-slate-900/40 dark:text-slate-200 dark:hover:bg-slate-900/55"
             >
               About
               <BsArrowUpRight />
             </Link>
             <Link
               to="/ecology"
-              className="flex items-center gap-2 rounded-full border border-white/50 bg-white/55 px-5 py-2 text-xs font-semibold text-slate-700 shadow-md shadow-slate-900/10 transition hover:bg-white/80 dark:border-slate-600/60 dark:bg-slate-900/60 dark:text-slate-200"
+              className="flex items-center gap-2 rounded-full border border-white/40 bg-white/40 px-5 py-2 text-xs font-semibold text-slate-700 shadow-md shadow-slate-900/10 transition hover:bg-white/60 dark:border-slate-500/40 dark:bg-slate-900/40 dark:text-slate-200 dark:hover:bg-slate-900/55"
             >
               Ecology
               <BsArrowUpRight />
             </Link>
             <Link
               to="/contact"
-              className="flex items-center gap-2 rounded-full border border-white/50 bg-white/55 px-5 py-2 text-xs font-semibold text-slate-700 shadow-md shadow-slate-900/10 transition hover:bg-white/80 dark:border-slate-600/60 dark:bg-slate-900/60 dark:text-slate-200"
+              className="flex items-center gap-2 rounded-full border border-white/40 bg-white/40 px-5 py-2 text-xs font-semibold text-slate-700 shadow-md shadow-slate-900/10 transition hover:bg-white/60 dark:border-slate-500/40 dark:bg-slate-900/40 dark:text-slate-200 dark:hover:bg-slate-900/55"
             >
               Contact
               <BsArrowUpRight />
@@ -205,7 +205,7 @@ const Homepage = () => {
       <section className="grid gap-4 md:grid-cols-3">
         {coreTiles.map(({ icon, title, body, cta, to }) => (
           <article key={title} className={`${glassPanel} flex flex-col gap-4`}>
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-white/50 bg-white/70 shadow-inner shadow-slate-900/10 dark:border-slate-600/60 dark:bg-slate-900/60">
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-white/40 bg-white/40 shadow-inner shadow-slate-900/10 dark:border-slate-500/40 dark:bg-slate-900/40">
               {icon}
             </div>
             <div className="space-y-2">
@@ -232,7 +232,7 @@ const Homepage = () => {
         ].map(({ value, label }) => (
           <div
             key={value}
-            className="rounded-2xl border border-white/40 bg-white/60 p-4 text-center shadow-inner shadow-slate-900/5 dark:border-slate-700/60 dark:bg-slate-900/55"
+            className="rounded-2xl border border-white/40 bg-white/40 p-4 text-center shadow-inner shadow-slate-900/5 backdrop-blur-2xl dark:border-slate-500/40 dark:bg-slate-900/40"
           >
             <p className="text-xl font-semibold text-emerald-600 dark:text-emerald-300">{value}</p>
             <p className="mt-2 text-xs text-slate-600 dark:text-slate-300">{label}</p>

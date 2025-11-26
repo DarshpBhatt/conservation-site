@@ -74,6 +74,8 @@ const WeatherWidget = () => {
     }
   };
 
+  const resolvedApiKey = import.meta.env.VITE_OPENWEATHER_API_KEY || "bd5e378503939ddaee76f12ad7a97608";
+
   useEffect(() => {
     // Try to load from cache first
     const cachedWeather = getCachedWeather();
@@ -85,6 +87,7 @@ const WeatherWidget = () => {
 
     const fetchWeather = async () => {
       try {
+<<<<<<< HEAD
         const params = {
           latitude: lat,
           longitude: lon,
@@ -93,6 +96,17 @@ const WeatherWidget = () => {
         };
         const url = "https://api.open-meteo.com/v1/forecast";
         const responses = await fetchWeatherApi(url, params);
+=======
+        const apiKey = resolvedApiKey;
+        console.log("API Key check:", apiKey ? "Found" : "Missing");
+
+        if (!apiKey) {
+          console.error("Weather API key not configured");
+          setError("API key missing");
+          setLoading(false);
+          return;
+        }
+>>>>>>> afed99339a48712be9497c5e11b39e6e8c434e9b
 
         // Process first location
         const response = responses[0];
@@ -147,7 +161,7 @@ const WeatherWidget = () => {
     // Refresh every 15 minutes (reduced from 10 to minimize API calls)
     const interval = setInterval(fetchWeather, 900000);
     return () => clearInterval(interval);
-  }, []);
+  }, [resolvedApiKey]);
 
   const getWeatherIcon = (weatherMain, isDay) => {
     // For clear weather, show sun during day and moon at night
@@ -166,30 +180,33 @@ const WeatherWidget = () => {
       Rain: <FaCloudRain className="text-lg text-sky-500" />,
       Drizzle: <FaCloudRain className="text-lg text-sky-500" />,
       Snow: <FaSnowflake className="text-lg text-blue-200" />,
-      Mist: <FaSmog className="text-lg text-slate-300" />,
-      Fog: <FaSmog className="text-lg text-slate-300" />,
+      Mist: <FaSmog className="text-lg text-slate-400" />,
+      Fog: <FaSmog className="text-lg text-slate-400" />,
     };
     return iconMap[weatherMain] || <FaSun className="text-lg text-amber-400" />;
   };
 
+  const baseClasses = "inline-flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-100";
+
   if (loading) {
     return (
-      <div className="flex items-center gap-2 text-xs text-slate-600 dark:text-slate-300">
-        <div className="h-3 w-3 animate-spin rounded-full border-2 border-emerald-500 border-t-transparent"></div>
-        <span className="hidden sm:inline">Loading...</span>
+      <div className={`${baseClasses} text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400`}>
+        <span className="inline-flex h-2 w-2 animate-pulse rounded-full bg-emerald-500" aria-hidden />
+        <span>Weather</span>
       </div>
     );
   }
 
   if (error || !weather) {
     return (
-      <div className="flex items-center gap-2 text-xs text-slate-600 dark:text-slate-300">
-        <IoLocationOutline />
-        <span className="hidden sm:inline">Weather unavailable</span>
+      <div className={`${baseClasses} text-slate-500 dark:text-slate-400`}>
+        <IoLocationOutline className="text-base" />
+        <span className="text-xs uppercase tracking-wide">Weather offline</span>
       </div>
     );
   }
 
+<<<<<<< HEAD
   // Determine if it's day or night - use API value if available, otherwise calculate from current time
   const getIsDay = () => {
     if (weather.is_day !== undefined) {
@@ -208,6 +225,19 @@ const WeatherWidget = () => {
         <span className="hidden sm:inline text-slate-500 dark:text-slate-400">•</span>
         <span className="capitalize text-slate-600 dark:text-slate-300 text-center sm:text-left">{weather.weather[0].description}</span>
       </div>
+=======
+  const temperature = Math.round(weather.main?.temp ?? 0);
+  const conditionMain = weather.weather?.[0]?.main || "Clear";
+  const conditionDescription = weather.weather?.[0]?.description || conditionMain;
+
+  return (
+    <div className={baseClasses} aria-label="Current weather">
+      <span className="inline-flex items-center justify-center text-emerald-500 dark:text-emerald-300">
+        {getWeatherIcon(conditionMain)}
+      </span>
+      <span className="text-base font-semibold leading-none text-slate-900 dark:text-white">{temperature}°C</span>
+      <span className="text-xs capitalize text-slate-500 dark:text-slate-400">{conditionDescription}</span>
+>>>>>>> afed99339a48712be9497c5e11b39e6e8c434e9b
     </div>
   );
 };

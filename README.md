@@ -84,6 +84,22 @@ The project includes a GitHub Actions workflow (`.github/workflows/azure-static-
 ### Hosted on Azure
 https://purple-field-0f81f6c10.3.azurestaticapps.net
 
+<<<<<<< HEAD
 ## License
 
 Private project - All rights reserved
+=======
+## Environment Variables
+
+The weather widget depends on the OpenWeather API.
+
+- A working public key is already provided (OpenWeather API key: `bd5e378503939ddaee76f12ad7a97608`) and bundled into `.env.example` plus `netlify.toml` so preview deployments stay functional.
+- For local work, copy `.env.example` to `.env.local` and adjust the key if you prefer to use your own credentials:
+
+```
+cp .env.example .env.local
+```
+
+- When running locally with Vite, restart the dev server after creating or updating the file so it can pick up the new value.
+- On Netlify (or any other host), define `VITE_OPENWEATHER_API_KEY` in the environment settings to override the default.
+>>>>>>> afed99339a48712be9497c5e11b39e6e8c434e9b
