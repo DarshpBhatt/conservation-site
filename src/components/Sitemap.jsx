@@ -221,15 +221,7 @@ function sanitizePolygonCoords(poly) {
   return cleaned;
 }
 
-<<<<<<< HEAD
 export default function Sitemap() {
-=======
-export default function Sitemap({ dark = false }) {
-  /* ------- Debug logging ------- */
-  console.log("Sitemap: mapData loaded:", !!mapData);
-  console.log("Sitemap: mapData structure:", mapData ? Object.keys(mapData) : "No data");
-
->>>>>>> afed99339a48712be9497c5e11b39e6e8c434e9b
   const [isMobile, setIsMobile] = useState(false);
   const [viewMode, setViewMode] = useState(VIEW_MODES.OVERVIEW);
     const [mapReady, setMapReady] = useState(false);

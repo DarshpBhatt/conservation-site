@@ -4,11 +4,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { FaApple, FaLeaf } from "react-icons/fa";
 import { FaJar } from "react-icons/fa6";
 import Footer from "./Footer";
-<<<<<<< HEAD
 import * as SpeechSDK from "microsoft-cognitiveservices-speech-sdk";
-
-=======
->>>>>>> afed99339a48712be9497c5e11b39e6e8c434e9b
 import appleTreesImage from "../assets/Shop/Appletrees.jpg";
 import pinCherryImage from "../assets/Shop/Pin Cherry.jpg";
 import jamsImage from "../assets/Shop/Jams.jpg";
