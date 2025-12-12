@@ -105,28 +105,32 @@ export default function Shop() {
         return;
       }
 
-    const speechConfig = SpeechSDK.SpeechConfig.fromSubscription(
-      speechKey,
-      speechRegion
-    );
-    speechConfig.speechSynthesisVoiceName = "en-US-JennyNeural";
+      const speechConfig = SpeechSDK.SpeechConfig.fromSubscription(
+        speechKey,
+        speechRegion
+      );
+      speechConfig.speechSynthesisVoiceName = "en-US-JennyNeural";
 
-    const player = new SpeechSDK.SpeakerAudioDestination();
-    const audioConfig = SpeechSDK.AudioConfig.fromSpeakerOutput(player);
+      const player = new SpeechSDK.SpeakerAudioDestination();
+      const audioConfig = SpeechSDK.AudioConfig.fromSpeakerOutput(player);
 
-    const synthesizer = new SpeechSDK.SpeechSynthesizer(
-      speechConfig,
-      audioConfig
-    );
+      const synthesizer = new SpeechSDK.SpeechSynthesizer(
+        speechConfig,
+        audioConfig
+      );
 
-    synthesizerRef.current = synthesizer;
-    playerRef.current = player;
+      synthesizerRef.current = synthesizer;
+      playerRef.current = player;
 
-    return () => {
-      if (synthesizerRef.current) synthesizerRef.current.close();
-      synthesizerRef.current = null;
-      playerRef.current = null;
-    };
+      return () => {
+        if (synthesizerRef.current) synthesizerRef.current.close();
+        synthesizerRef.current = null;
+        playerRef.current = null;
+      };
+    } catch (error) {
+      // Silently fail on initialization error - error shown when user clicks play
+      console.error('Failed to initialize Azure Speech SDK:', error);
+    }
   }, []); // Initialize once on mount
 
   // ============================================================================
