@@ -132,20 +132,28 @@ const Homepage = () => {
       const speechKey = import.meta.env.VITE_AZURE_SPEECH_KEY;
       const speechRegion = import.meta.env.VITE_AZURE_REGION;
 
+      // ============================================================================
+      // TODO: REMOVE THIS SECTION ONCE API KEYS ARE CONFIGURED
+      // This alert check can be removed after VITE_AZURE_SPEECH_KEY and VITE_AZURE_REGION
+      // are properly set in environment variables (Netlify/Azure dashboard or .env file)
+      // ============================================================================
       // Check for API keys before attempting playback
       if (!speechKey || !speechRegion) {
-        setAlertMessage("Azure Speech API keys are missing. Please configure VITE_AZURE_SPEECH_KEY and VITE_AZURE_REGION in your environment variables.");
-        // Auto-dismiss alert after 5 seconds to avoid UI clutter
-        setTimeout(() => setAlertMessage(null), 5000);
+        setAlertMessage("Azure Speech API keys are missing. Please update VITE_AZURE_SPEECH_KEY and VITE_AZURE_REGION in your environment variables (Netlify/Azure dashboard) or .env file for local development.");
+        // Auto-dismiss alert after 8 seconds to give user time to read
+        setTimeout(() => setAlertMessage(null), 8000);
         return;
       }
+      // ============================================================================
+      // END OF SECTION TO REMOVE ONCE API KEYS ARE CONFIGURED
+      // ============================================================================
 
       const synthesizer = synthesizerRef.current;
       const player = playerRef.current;
       // Verify synthesizer was initialized successfully
       if (!synthesizer) {
-        setAlertMessage("Text-to-speech is not initialized. Please refresh the page.");
-        setTimeout(() => setAlertMessage(null), 5000);
+        setAlertMessage("Text-to-speech is not initialized. Please configure Azure API keys and refresh the page.");
+        setTimeout(() => setAlertMessage(null), 8000);
         return;
       }
 
@@ -170,15 +178,15 @@ const Homepage = () => {
         },
         (err) => {
           console.error("Speech error:", err);
-          setAlertMessage("Failed to play audio. Please check your Azure Speech API configuration.");
-          setTimeout(() => setAlertMessage(null), 5000);
+          setAlertMessage("Failed to play audio. Please update your Azure Speech API keys (VITE_AZURE_SPEECH_KEY and VITE_AZURE_REGION) in environment variables.");
+          setTimeout(() => setAlertMessage(null), 8000);
           setIsSpeaking(false);
         }
       );
     } catch (error) {
       console.error("Error playing audio:", error);
-      setAlertMessage("An error occurred while trying to play audio.");
-      setTimeout(() => setAlertMessage(null), 5000);
+      setAlertMessage("An error occurred while trying to play audio. Please update your Azure Speech API keys.");
+      setTimeout(() => setAlertMessage(null), 8000);
     }
   };
 
