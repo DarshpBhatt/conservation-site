@@ -225,20 +225,21 @@ const Gallery = () => {
             </p>
 
             {/* AUDIO BUTTONS */}
-          <div className="flex gap-3 mt-4">
-            <button
-              onClick={playHeaderAudio}
-              className="px-4 py-2 rounded-full bg-emerald-600 text-white text-sm font-medium shadow hover:bg-emerald-700"
-            >
-              Play Audio
-            </button>
+            <div className="flex gap-3 mt-4">
+              <button
+                onClick={playHeaderAudio}
+                className="px-4 py-2 rounded-full bg-emerald-600 text-white text-sm font-medium shadow hover:bg-emerald-700"
+              >
+                Play Audio
+              </button>
 
-            <button
-              onClick={stopHeaderAudio}
-              className="px-4 py-2 rounded-full bg-red-600 text-white text-sm font-medium shadow hover:bg-red-700"
-            >
-              Stop Audio
-            </button>
+              <button
+                onClick={stopHeaderAudio}
+                className="px-4 py-2 rounded-full bg-red-600 text-white text-sm font-medium shadow hover:bg-red-700"
+              >
+                Stop Audio
+              </button>
+            </div>
           </div>
         </div>
       </header>
