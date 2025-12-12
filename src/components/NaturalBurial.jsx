@@ -273,6 +273,7 @@ export default function NaturalBurial() {
               Stop Audio
             </button>
           </div>
+          </div>
         </div>
       </header>
 
