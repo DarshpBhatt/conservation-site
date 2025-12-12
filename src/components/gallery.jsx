@@ -8,6 +8,7 @@
  */
 
 import React, { useState, useRef, useEffect } from 'react';
+import { IoClose, IoWarningOutline } from "react-icons/io5";
 import Footer from './Footer';
 import * as SpeechSDK from "microsoft-cognitiveservices-speech-sdk";
 
@@ -58,6 +59,8 @@ const Gallery = () => {
 
   // Text-to-speech state
   const [isSpeaking, setIsSpeaking] = useState(false);
+  // Store alert message for API key configuration errors
+  const [alertMessage, setAlertMessage] = useState(null);
   const synthesizerRef = useRef(null);
   const playerRef = useRef(null);
 
@@ -112,30 +115,51 @@ const Gallery = () => {
   // ============================================================================
   
   /**
-   * Play header audio narration
-   * Note: This component doesn't have try-catch alerts like others
-   * Consider adding error handling for consistency
+   * Play header audio narration with error handling
    */
   const playHeaderAudio = () => {
-    const synthesizer = synthesizerRef.current;
-    const player = playerRef.current;
-    if (!synthesizer) return;
+    try {
+      const speechKey = import.meta.env.VITE_AZURE_SPEECH_KEY;
+      const speechRegion = import.meta.env.VITE_AZURE_REGION;
 
-    const text = 
-      "Enchanting Forest Gallery. Discover the breathtaking beauty of forests and serene landscapes. " +
-      "Feel free to add your favorite photos to enrich this gallery.";
-
-    if (player) player.resume();
-
-    setIsSpeaking(true);
-    synthesizer.speakTextAsync(
-      text,
-      () => setIsSpeaking(false),
-      (err) => {
-        console.error("Speech error:", err);
-        setIsSpeaking(false);
+      // Check for API keys before attempting playback
+      if (!speechKey || !speechRegion) {
+        setAlertMessage("Azure Speech API keys are missing. Please configure VITE_AZURE_SPEECH_KEY and VITE_AZURE_REGION in your environment variables.");
+        setTimeout(() => setAlertMessage(null), 5000);
+        return;
       }
-    );
+
+      const synthesizer = synthesizerRef.current;
+      const player = playerRef.current;
+      // Verify synthesizer was initialized successfully
+      if (!synthesizer) {
+        setAlertMessage("Text-to-speech is not initialized. Please refresh the page.");
+        setTimeout(() => setAlertMessage(null), 5000);
+        return;
+      }
+
+      const text = 
+        "Enchanting Forest Gallery. Discover the breathtaking beauty of forests and serene landscapes. " +
+        "Feel free to add your favorite photos to enrich this gallery.";
+
+      if (player) player.resume();
+
+      setIsSpeaking(true);
+      synthesizer.speakTextAsync(
+        text,
+        () => setIsSpeaking(false),
+        (err) => {
+          console.error("Speech error:", err);
+          setAlertMessage("Failed to play audio. Please check your Azure Speech API configuration.");
+          setTimeout(() => setAlertMessage(null), 5000);
+          setIsSpeaking(false);
+        }
+      );
+    } catch (error) {
+      console.error("Error playing audio:", error);
+      setAlertMessage("An error occurred while trying to play audio.");
+      setTimeout(() => setAlertMessage(null), 5000);
+    }
   };
 
   /**
@@ -171,15 +195,36 @@ const Gallery = () => {
 
       {/* HEADER */}
       <header className={`${glassPanel} flex flex-col gap-5 md:flex-row md:items-center md:justify-between`}>
-        <div>
-          <h1 className="text-2xl font-semibold md:text-3xl">
-            Enchanting Forest Gallery
-          </h1>
-          <p className="mt-2 max-w-2xl text-sm text-slate-600 dark:text-slate-300">
-            Discover the breathtaking beauty of forests and serene landscapes. Feel free to add your favorite photos to enrich this gallery!
-          </p>
+        <div className="space-y-2 pt-1">
+          {/* Display alert when API keys are missing or errors occur */}
+          {alertMessage && (
+            <div className="flex items-start gap-2 rounded-lg border border-amber-400/50 bg-amber-50/90 p-3 text-xs text-amber-800 dark:border-amber-500/50 dark:bg-amber-900/90 dark:text-amber-200">
+              <IoWarningOutline className="mt-0.5 h-4 w-4 flex-shrink-0" />
+              <div className="flex-1">
+                <p className="font-medium">Azure API Keys Required</p>
+                <p className="mt-1">{alertMessage}</p>
+                <p className="mt-2 text-xs">
+                  Configure in Netlify/Azure environment variables or create a <code className="rounded bg-amber-200/50 px-1 dark:bg-amber-800/50">.env</code> file for local development.
+                </p>
+              </div>
+              <button
+                onClick={() => setAlertMessage(null)}
+                className="flex-shrink-0 text-amber-600 hover:text-amber-800 dark:text-amber-400 dark:hover:text-amber-200"
+                aria-label="Dismiss"
+              >
+                <IoClose className="h-4 w-4" />
+              </button>
+            </div>
+          )}
+          <div>
+            <h1 className="text-2xl font-semibold md:text-3xl">
+              Enchanting Forest Gallery
+            </h1>
+            <p className="mt-2 max-w-2xl text-sm text-slate-600 dark:text-slate-300">
+              Discover the breathtaking beauty of forests and serene landscapes. Feel free to add your favorite photos to enrich this gallery!
+            </p>
 
-          {/* AUDIO BUTTONS */}
+            {/* AUDIO BUTTONS */}
           <div className="flex gap-3 mt-4">
             <button
               onClick={playHeaderAudio}
