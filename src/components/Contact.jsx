@@ -1,4 +1,11 @@
-// Purpose: To display the Contact section of the Woodland Conservation website
+/**
+ * ================================================================================
+ * File: Contact.jsx
+ * Author: ADM (Abhishek Darsh Manar) 2025 Fall - Software Engineering (CSCI-3428-1)
+ * Description: Contact page with form, address information, and social media links.
+ * Includes Azure text-to-speech for header narration and accessibility.
+ * ================================================================================
+ */
 
 import React, { useState, useRef, useEffect } from "react";
 import {
@@ -9,76 +16,133 @@ import {
   FaInstagram,
 } from "react-icons/fa";
 import { FaXTwitter } from "react-icons/fa6";
+import { IoClose, IoWarningOutline } from "react-icons/io5";
 import Footer from "./Footer";
 import * as SpeechSDK from "microsoft-cognitiveservices-speech-sdk";
 
+// ============================================================================
+// Contact Component
+// ============================================================================
+
+/**
+ * Contact Component - Contact form and information page
+ * @returns {JSX.Element}
+ */
 const Contact = () => {
+  // ============================================================================
+  // State Management
+  // ============================================================================
+  
+  // Selected contact reason from dropdown
   const [contactReason, setContactReason] = useState("");
 
+  // Reusable glass morphism styling
   const glassPanel =
     "rounded-3xl border border-white/40 bg-white/60 p-6 shadow-lg shadow-slate-900/10 backdrop-blur-2xl transition-colors duration-300 dark:border-slate-700/60 dark:bg-slate-900/55";
 
-  // ---------- AUDIO STATE (HEADER ONLY) ----------
+  // Text-to-speech state and refs
   const [isSpeaking, setIsSpeaking] = useState(false);
+  const [alertMessage, setAlertMessage] = useState(null);
   const synthesizerRef = useRef(null);
   const playerRef = useRef(null);
 
+  // ============================================================================
+  // Azure Text-to-Speech Initialization
+  // ============================================================================
+  
+  /**
+   * Initialize Azure Speech SDK on component mount
+   * Only initializes if API keys are present
+   */
   useEffect(() => {
-    const speechKey = import.meta.env.VITE_AZURE_SPEECH_KEY;
-    const speechRegion = import.meta.env.VITE_AZURE_REGION;
+    try {
+      const speechKey = import.meta.env.VITE_AZURE_SPEECH_KEY;
+      const speechRegion = import.meta.env.VITE_AZURE_REGION;
 
-    if (!speechKey || !speechRegion) {
-      console.warn("Azure Speech key/region are missing in .env");
-      return;
+      // Silently fail if keys missing - error shown when user clicks play
+      if (!speechKey || !speechRegion) {
+        return;
+      }
+
+      const speechConfig = SpeechSDK.SpeechConfig.fromSubscription(
+        speechKey,
+        speechRegion
+      );
+      speechConfig.speechSynthesisVoiceName = "en-US-JennyNeural";
+
+      const player = new SpeechSDK.SpeakerAudioDestination();
+      const audioConfig = SpeechSDK.AudioConfig.fromSpeakerOutput(player);
+
+      const synthesizer = new SpeechSDK.SpeechSynthesizer(
+        speechConfig,
+        audioConfig
+      );
+
+      synthesizerRef.current = synthesizer;
+      playerRef.current = player;
+    } catch (error) {
+      console.error("Failed to initialize Azure Speech:", error);
     }
-
-    const speechConfig = SpeechSDK.SpeechConfig.fromSubscription(
-      speechKey,
-      speechRegion
-    );
-    speechConfig.speechSynthesisVoiceName = "en-US-JennyNeural";
-
-    const player = new SpeechSDK.SpeakerAudioDestination();
-    const audioConfig = SpeechSDK.AudioConfig.fromSpeakerOutput(player);
-
-    const synthesizer = new SpeechSDK.SpeechSynthesizer(
-      speechConfig,
-      audioConfig
-    );
-
-    synthesizerRef.current = synthesizer;
-    playerRef.current = player;
 
     return () => {
       if (synthesizerRef.current) synthesizerRef.current.close();
       synthesizerRef.current = null;
       playerRef.current = null;
     };
-  }, []);
+  }, []); // Initialize once on mount
 
+  // ============================================================================
+  // Event Handlers
+  // ============================================================================
+  
+  /**
+   * Play header audio narration with error handling
+   * Displays alert if API keys are missing or initialization failed
+   */
   const playHeaderAudio = () => {
-    const synthesizer = synthesizerRef.current;
-    const player = playerRef.current;
-    if (!synthesizer) return;
+    try {
+      const speechKey = import.meta.env.VITE_AZURE_SPEECH_KEY;
+      const speechRegion = import.meta.env.VITE_AZURE_REGION;
 
-    const text =
-      "Get in touch. We would love to hear from you. " +
-      "Use the form below or connect with us through our social channels " +
-      "to share feedback, volunteer, or plan a visit.";
-
-    if (player) {
-      player.resume();
-    }
-
-    setIsSpeaking(true);
-    synthesizer.speakTextAsync(
-      text,
-      () => setIsSpeaking(false),
-      (err) => {
-        console.error("Speech error:", err);
-        setIsSpeaking(false);
+      if (!speechKey || !speechRegion) {
+        setAlertMessage("Azure Speech API keys are missing. Please configure VITE_AZURE_SPEECH_KEY and VITE_AZURE_REGION in your environment variables.");
+        setTimeout(() => setAlertMessage(null), 5000);
+        return;
       }
-    );
+
+      const synthesizer = synthesizerRef.current;
+      const player = playerRef.current;
+      if (!synthesizer) {
+        setAlertMessage("Text-to-speech is not initialized. Please refresh the page.");
+        setTimeout(() => setAlertMessage(null), 5000);
+        return;
+      }
+
+      const text =
+        "Get in touch. We would love to hear from you. " +
+        "Use the form below or connect with us through our social channels " +
+        "to share feedback, volunteer, or plan a visit.";
+
+      if (player) {
+        player.resume();
+      }
+
+      setIsSpeaking(true);
+      synthesizer.speakTextAsync(
+        text,
+        () => setIsSpeaking(false),
+        (err) => {
+          console.error("Speech error:", err);
+          setAlertMessage("Failed to play audio. Please check your Azure Speech API configuration.");
+          setTimeout(() => setAlertMessage(null), 5000);
+          setIsSpeaking(false);
+        }
+      );
+    } catch (error) {
+      console.error("Error playing audio:", error);
+      setAlertMessage("An error occurred while trying to play audio.");
+      setTimeout(() => setAlertMessage(null), 5000);
+    }
   };
 
   const stopHeaderAudio = () => {
@@ -88,8 +152,11 @@ const Contact = () => {
 
     setIsSpeaking(false);
   };
-  // ---------- END AUDIO ----------
 
+  // ============================================================================
+  // Render
+  // ============================================================================
+  
   return (
     <div className="flex flex-col gap-8 text-slate-800 dark:text-slate-100">
       <header className={`${glassPanel} flex flex-col gap-5 md:flex-row md:items-center md:justify-between`}>
@@ -101,21 +168,42 @@ const Contact = () => {
           </p>
 
           {/* AUDIO BUTTONS */}
-          <div className="flex gap-3 mt-4">
-            <button
-              type="button"
-              onClick={playHeaderAudio}
-              className="px-4 py-2 rounded-full bg-emerald-600 text-white text-sm font-medium shadow hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900"
-            >
-              Play Audio
-            </button>
-            <button
-              type="button"
-              onClick={stopHeaderAudio}
-              className="px-4 py-2 rounded-full bg-red-600 text-white text-sm font-medium shadow hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900"
-            >
-              Stop Audio
-            </button>
+          <div className="space-y-2 mt-4">
+            {alertMessage && (
+              <div className="flex items-start gap-2 rounded-lg border border-amber-400/50 bg-amber-50/90 p-3 text-xs text-amber-800 dark:border-amber-500/50 dark:bg-amber-900/90 dark:text-amber-200">
+                <IoWarningOutline className="mt-0.5 h-4 w-4 flex-shrink-0" />
+                <div className="flex-1">
+                  <p className="font-medium">Azure API Keys Required</p>
+                  <p className="mt-1">{alertMessage}</p>
+                  <p className="mt-2 text-xs">
+                    Configure in Netlify/Azure environment variables or create a <code className="rounded bg-amber-200/50 px-1 dark:bg-amber-800/50">.env</code> file for local development.
+                  </p>
+                </div>
+                <button
+                  onClick={() => setAlertMessage(null)}
+                  className="flex-shrink-0 text-amber-600 hover:text-amber-800 dark:text-amber-400 dark:hover:text-amber-200"
+                  aria-label="Dismiss"
+                >
+                  <IoClose className="h-4 w-4" />
+                </button>
+              </div>
+            )}
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={playHeaderAudio}
+                className="px-4 py-2 rounded-full bg-emerald-600 text-white text-sm font-medium shadow hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900"
+              >
+                Play Audio
+              </button>
+              <button
+                type="button"
+                onClick={stopHeaderAudio}
+                className="px-4 py-2 rounded-full bg-red-600 text-white text-sm font-medium shadow hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900"
+              >
+                Stop Audio
+              </button>
+            </div>
           </div>
         </div>
       </header>

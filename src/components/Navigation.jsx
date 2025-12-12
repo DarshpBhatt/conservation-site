@@ -1,4 +1,11 @@
-// Purpose: Navigation component that provides responsive navigation bar for desktop and mobile devices
+/**
+ * ================================================================================
+ * File: Navigation.jsx
+ * Author: ADM (Abhishek Darsh Manar) 2025 Fall - Software Engineering (CSCI-3428-1)
+ * Description: Responsive navigation component with mobile menu, dark mode toggle,
+ * and CSS custom property management for layout spacing.
+ * ================================================================================
+ */
 
 import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
@@ -6,12 +13,35 @@ import logo from "../assets/logo.png";
 import { IoMoon, IoSunny } from "react-icons/io5";
 import WeatherWidget from "./WeatherWidget";
 
-// Navigation component definition
+// ============================================================================
+// Navigation Component
+// ============================================================================
+
+/**
+ * Navigation Component - Responsive navigation bar with mobile menu
+ * @param {Object} props
+ * @param {Function} props.toggleDarkMode - Handler to toggle dark mode
+ * @param {boolean} props.dark - Current dark mode state
+ * @returns {JSX.Element}
+ */
 const Navigation = ({ toggleDarkMode, dark }) => {
-  const [isOpen, setIsOpen] = useState(false); // State to manage the navigation menu
+  // ============================================================================
+  // State Management
+  // ============================================================================
+  
+  // Track mobile menu open/closed state
+  const [isOpen, setIsOpen] = useState(false);
   const navRef = useRef(null);
 
-  // Prevent body scroll when mobile menu is open
+  // ============================================================================
+  // Side Effects
+  // ============================================================================
+  
+  /**
+   * Prevent body scroll when mobile menu is open
+   * Prevents background scrolling while menu overlay is active
+   * Dependency on isOpen ensures scroll lock updates when menu state changes
+   */
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = "hidden";
@@ -23,9 +53,13 @@ const Navigation = ({ toggleDarkMode, dark }) => {
     return () => {
       document.body.style.overflow = "unset";
     };
-  }, [isOpen]);
+  }, [isOpen]); // Re-run when menu open state changes
 
-  // Keep CSS custom properties in sync with the navbar's size/offset
+  /**
+   * Update CSS custom properties for navigation height
+   * Allows other components to calculate spacing based on nav height
+   * Updates on resize and menu state changes to handle dynamic sizing
+   */
   useEffect(() => {
     if (typeof window === "undefined") return;
 
@@ -45,13 +79,24 @@ const Navigation = ({ toggleDarkMode, dark }) => {
     return () => {
       window.removeEventListener("resize", updateNavMetrics);
     };
-  }, [isOpen]);
+  }, [isOpen]); // Re-calculate when menu state or window size changes
 
-  // Function to toggle navigation menu
+  // ============================================================================
+  // Event Handlers
+  // ============================================================================
+  
+  /**
+   * Toggle mobile navigation menu open/closed state
+   */
   const toggleNav = () => {
     setIsOpen(!isOpen);
   };
 
+  // ============================================================================
+  // Render
+  // ============================================================================
+  
+  // Reusable link styling for consistent navigation appearance
   const linkBase =
     "py-2 px-4 rounded-xl transition-colors duration-300 text-sm lg:text-base font-semibold text-slate-800 dark:text-slate-100 hover:bg-white/40 hover:text-emerald-700 dark:hover:text-emerald-300";
 
@@ -139,8 +184,10 @@ const Navigation = ({ toggleDarkMode, dark }) => {
         </div>
       </nav>
 
+      {/* Mobile menu overlay - only visible on mobile devices */}
       {isOpen && (
         <>
+          {/* Backdrop overlay - clicking closes menu */}
           <div className="fixed inset-0 z-40 bg-slate-900/60 backdrop-blur-md md:hidden" onClick={toggleNav} />
           <div className="fixed top-4 right-4 z-50 w-[86vw] max-w-sm rounded-3xl border border-white/40 bg-white/70 p-6 shadow-2xl shadow-slate-900/30 backdrop-blur-3xl transition-colors duration-300 dark:border-slate-700/60 dark:bg-slate-900/70 md:hidden">
             <div className="mb-6 flex items-center justify-between">

@@ -1,13 +1,25 @@
-// Purpose: To display the Gallery page with user-uploaded photos and image upload functionality 
+/**
+ * ================================================================================
+ * File: gallery.jsx
+ * Author: ADM (Abhishek Darsh Manar) 2025 Fall - Software Engineering (CSCI-3428-1)
+ * Description: Photo gallery component displaying conservation area images with
+ * upload functionality and Azure text-to-speech for accessibility.
+ * ================================================================================
+ */
 
 import React, { useState, useRef, useEffect } from 'react';
 import Footer from './Footer';
 import * as SpeechSDK from "microsoft-cognitiveservices-speech-sdk";
 
+// ============================================================================
+// Constants
+// ============================================================================
+
+// Reusable glass morphism styling
 const glassPanel =
   "rounded-3xl border border-white/40 bg-white/60 p-6 shadow-lg shadow-slate-900/10 backdrop-blur-2xl transition-colors duration-300 dark:border-slate-700/60 dark:bg-slate-900/55";
 
-// Import images from the assets folder
+// Import default gallery images from assets folder
 import image1 from '../assets/download-1.jpg';
 import image2 from '../assets/download-2.jpg';
 import image3 from '../assets/download-3.jpg';
@@ -18,8 +30,20 @@ import image7 from '../assets/download-10.jpg';
 import image8 from '../assets/download-11.jpg';
 import image9 from '../assets/images-1.jpg';
 
-const Gallery = () => {
+// ============================================================================
+// Gallery Component
+// ============================================================================
 
+/**
+ * Gallery Component - Photo gallery with upload functionality
+ * @returns {JSX.Element}
+ */
+const Gallery = () => {
+  // ============================================================================
+  // State Management
+  // ============================================================================
+  
+  // Gallery images - initialized with default images, can be extended with uploads
   const [images, setImages] = useState([
     { src: image1, name: 'Image 1' },
     { src: image2, name: 'Image 2' },
@@ -32,19 +56,28 @@ const Gallery = () => {
     { src: image9, name: 'Image 9' },
   ]);
 
-  // 📌 Azure Text-to-Speech Setup
+  // Text-to-speech state
   const [isSpeaking, setIsSpeaking] = useState(false);
   const synthesizerRef = useRef(null);
   const playerRef = useRef(null);
 
+  // ============================================================================
+  // Azure Text-to-Speech Initialization
+  // ============================================================================
+  
+  /**
+   * Initialize Azure Speech SDK on component mount
+   * Only initializes if API keys are present
+   */
   useEffect(() => {
-    const speechKey = import.meta.env.VITE_AZURE_SPEECH_KEY;
-    const speechRegion = import.meta.env.VITE_AZURE_REGION;
+    try {
+      const speechKey = import.meta.env.VITE_AZURE_SPEECH_KEY;
+      const speechRegion = import.meta.env.VITE_AZURE_REGION;
 
-    if (!speechKey || !speechRegion) {
-      console.warn("Azure Speech key/region are missing from .env");
-      return;
-    }
+      // Silently fail if keys missing - error shown when user clicks play
+      if (!speechKey || !speechRegion) {
+        return;
+      }
 
     const speechConfig = SpeechSDK.SpeechConfig.fromSubscription(
       speechKey,
@@ -68,9 +101,17 @@ const Gallery = () => {
       synthesizerRef.current = null;
       playerRef.current = null;
     };
-  }, []);
+  }, []); // Initialize once on mount
 
-  // ▶ Play header audio
+  // ============================================================================
+  // Event Handlers
+  // ============================================================================
+  
+  /**
+   * Play header audio narration
+   * Note: This component doesn't have try-catch alerts like others
+   * Consider adding error handling for consistency
+   */
   const playHeaderAudio = () => {
     const synthesizer = synthesizerRef.current;
     const player = playerRef.current;
@@ -93,7 +134,9 @@ const Gallery = () => {
     );
   };
 
-  // ⏹ Stop Speech Immediately
+  /**
+   * Stop audio playback immediately by pausing player
+   */
   const stopHeaderAudio = () => {
     const player = playerRef.current;
 

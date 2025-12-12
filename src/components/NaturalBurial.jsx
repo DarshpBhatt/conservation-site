@@ -1,4 +1,11 @@
-// Purpose: Natural Burial page component
+/**
+ * ================================================================================
+ * File: NaturalBurial.jsx
+ * Author: ADM (Abhishek Darsh Manar) 2025 Fall - Software Engineering (CSCI-3428-1)
+ * Description: Natural burial information page displaying benefits, process,
+ * and environmental impact with Azure text-to-speech for accessibility.
+ * ================================================================================
+ */
 
 import React, { useState, useRef, useEffect } from "react";
 import {
@@ -12,23 +19,49 @@ import {
 import Footer from "./Footer";
 import * as SpeechSDK from "microsoft-cognitiveservices-speech-sdk";
 
+// ============================================================================
+// Constants
+// ============================================================================
+
+// Reusable glass morphism styling
 const glassPanel =
   "rounded-3xl border border-white/40 bg-white/60 p-6 shadow-lg shadow-slate-900/10 backdrop-blur-2xl transition-colors duration-300 dark:border-slate-700/60 dark:bg-slate-900/55";
 
+// ============================================================================
+// NaturalBurial Component
+// ============================================================================
+
+/**
+ * NaturalBurial Component - Information about natural burial practices
+ * @returns {JSX.Element}
+ */
 export default function NaturalBurial() {
-  // ---------- AUDIO STATE (HEADER ONLY) ----------
+  // ============================================================================
+  // State Management
+  // ============================================================================
+  
+  // Text-to-speech state
   const [isSpeaking, setIsSpeaking] = useState(false);
   const synthesizerRef = useRef(null);
   const playerRef = useRef(null);
 
+  // ============================================================================
+  // Azure Text-to-Speech Initialization
+  // ============================================================================
+  
+  /**
+   * Initialize Azure Speech SDK on component mount
+   * Only initializes if API keys are present
+   */
   useEffect(() => {
-    const speechKey = import.meta.env.VITE_AZURE_SPEECH_KEY;
-    const speechRegion = import.meta.env.VITE_AZURE_REGION;
+    try {
+      const speechKey = import.meta.env.VITE_AZURE_SPEECH_KEY;
+      const speechRegion = import.meta.env.VITE_AZURE_REGION;
 
-    if (!speechKey || !speechRegion) {
-      console.warn("Azure Speech key/region are missing in .env");
-      return;
-    }
+      // Silently fail if keys missing - error shown when user clicks play
+      if (!speechKey || !speechRegion) {
+        return;
+      }
 
     const speechConfig = SpeechSDK.SpeechConfig.fromSubscription(
       speechKey,
@@ -52,8 +85,17 @@ export default function NaturalBurial() {
       synthesizerRef.current = null;
       playerRef.current = null;
     };
-  }, []);
+  }, []); // Initialize once on mount
 
+  // ============================================================================
+  // Event Handlers
+  // ============================================================================
+  
+  /**
+   * Play header audio narration
+   * Note: This component doesn't have try-catch alerts like others
+   * Consider adding error handling for consistency
+   */
   const playHeaderAudio = () => {
     const synthesizer = synthesizerRef.current;
     const player = playerRef.current;
@@ -88,8 +130,12 @@ export default function NaturalBurial() {
 
     setIsSpeaking(false);
   };
-  // ---------- END AUDIO ----------
 
+  // ============================================================================
+  // Data Configuration
+  // ============================================================================
+  
+  // Information cards displayed on page
   const cards = [
     {
       title: "Helping Nature",

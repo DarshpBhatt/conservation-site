@@ -1,10 +1,12 @@
-/* src/components/Sitemap.jsx
-   STATIC map + Talking Trees (3 m proximity) + DIAGNOSTICS
-   - Totally static (no zoom, drag, pan)
-   - ErrorBoundary prints runtime errors on-screen
-   - Defensive guards for polygons/POIs
-   - Uses /public/images/north-arrow.jpeg for the compass
-*/
+/**
+ * ================================================================================
+ * File: Sitemap.jsx
+ * Author: ADM (Abhishek Darsh Manar) 2025 Fall - Software Engineering (CSCI-3428-1)
+ * Description: Interactive trail map component with static view, geolocation tracking,
+ * proximity-based audio triggers (Talking Trees), and real-time POI detection.
+ * Uses Leaflet for map rendering and geospatial utilities for distance calculations.
+ * ================================================================================
+ */
 
 import React, { useEffect, useRef, useState, useMemo } from "react";
 import {
@@ -36,6 +38,14 @@ import sittingIcon from "../assets/sitting.png";
 import birchIcon from "../assets/birch.png";
 import forestIcon from "../assets/homepage-banner.jpg";
 
+// ============================================================================
+// Icon Configuration
+// ============================================================================
+
+/**
+ * Custom icon for user's current location marker
+ * Uses divIcon for custom styling with gradient and shadow
+ */
 const userLocationIcon = L.divIcon({
   className: "user-location-icon",
   html: `<div style="
@@ -50,11 +60,14 @@ const userLocationIcon = L.divIcon({
   iconAnchor: [9, 9],
 });
 
+// Default icon configuration for POIs without specific type
 const DEFAULT_ICON_CONFIG = {
   image: forestIcon,
   color: "#ef4444",
 };
 
+// Icon configurations mapped to POI types
+// Each type has custom image and color for visual distinction
 const ICON_CONFIGS = {
   trailhead: {
     image: hikingIcon,
@@ -90,11 +103,20 @@ const ICON_CONFIGS = {
   },
 };
 
+// ============================================================================
+// Constants
+// ============================================================================
+
+// Map view modes: overview shows all areas, trail focuses on trail path
 const VIEW_MODES = {
   OVERVIEW: "overview",
   TRAIL: "trail",
 };
+
+// Offset for navigation bar height (prevents map from being hidden behind nav)
 const NAV_LAYOUT_OFFSET_PX = 160;
+
+// Styling for different conservation areas on map
 const AREA_STYLES = {
   rewildingArea: {
     stroke: "#15803d",
@@ -112,6 +134,9 @@ const AREA_STYLES = {
     label: "Wetland Area",
   },
 };
+
+// Ordered list of POI IDs along the trail route
+// Used to filter and display trail markers in sequence
 const TRAIL_POI_IDS = [
   "trailhead",
   "well1",
@@ -123,7 +148,15 @@ const TRAIL_POI_IDS = [
   "labyrinth",
 ];
 
-/* ---------------- Error Boundary ---------------- */
+// ============================================================================
+// Error Boundary Component
+// ============================================================================
+
+/**
+ * ErrorBoundary - Catches runtime errors in map component and displays on-screen
+ * Prevents entire app from crashing if map initialization or geolocation fails
+ * Displays error message in red box for debugging
+ */
 class ErrorBoundary extends React.Component {
   constructor(props) {
     super(props);
@@ -147,7 +180,15 @@ class ErrorBoundary extends React.Component {
   }
 }
 
-/* --------------- Leaflet Icon Setup (safe) --------------- */
+// ============================================================================
+// Leaflet Icon Configuration
+// ============================================================================
+
+/**
+ * Configure default Leaflet marker icons from CDN
+ * Prevents missing icon errors when Leaflet tries to load default markers
+ * Safe check ensures L.Icon exists before accessing
+ */
 if (L?.Icon?.Default) {
   L.Icon.Default.mergeOptions({
     iconRetinaUrl:
@@ -159,7 +200,12 @@ if (L?.Icon?.Default) {
   });
 }
 
-/* --------------- Custom Icons for POI Types using existing assets --------------- */
+/**
+ * Create custom Leaflet icon for POI markers
+ * Uses divIcon with HTML/CSS for custom styling per POI type
+ * @param {string} type - POI type (trailhead, well, farmhouse, etc.)
+ * @returns {L.DivIcon} Leaflet divIcon instance
+ */
 const createCustomIcon = (type) => {
   const config = ICON_CONFIGS[type] || DEFAULT_ICON_CONFIG;
 
@@ -212,6 +258,12 @@ function isLatLngPair(pair) {
   );
 }
 
+/**
+ * Sanitize polygon coordinates by filtering invalid points
+ * Prevents map rendering errors from malformed coordinate data
+ * @param {Array} poly - Array of coordinate pairs
+ * @returns {Array} Cleaned array of valid [lat, lng] pairs
+ */
 function sanitizePolygonCoords(poly) {
   if (!Array.isArray(poly)) return [];
   const cleaned = poly.filter(isLatLngPair);
@@ -221,27 +273,63 @@ function sanitizePolygonCoords(poly) {
   return cleaned;
 }
 
+// ============================================================================
+// Sitemap Component
+// ============================================================================
+
+/**
+ * Sitemap Component - Interactive trail map with geolocation and proximity audio
+ * Features static map view, real-time user tracking, and Talking Trees (3m proximity)
+ * @returns {JSX.Element}
+ */
 export default function Sitemap() {
+  // ============================================================================
+  // State Management
+  // ============================================================================
+  
+  // Detect mobile viewport for responsive layout adjustments
   const [isMobile, setIsMobile] = useState(false);
+  // Current map view mode (overview or trail-focused)
   const [viewMode, setViewMode] = useState(VIEW_MODES.OVERVIEW);
-    const [mapReady, setMapReady] = useState(false);
+  // Track when Leaflet map instance is ready for interaction
+  const [mapReady, setMapReady] = useState(false);
   const mapRef = useRef(null);
 
-    useEffect(() => {
-      const handleResize = () => {
-        setIsMobile(window.innerWidth <= 720);
-      };
-      handleResize();
-      window.addEventListener("resize", handleResize);
-      return () => window.removeEventListener("resize", handleResize);
-    }, []);
+  // ============================================================================
+  // Side Effects
+  // ============================================================================
+  
+  /**
+   * Detect mobile viewport and update state on resize
+   * 720px breakpoint matches Tailwind's md breakpoint
+   */
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 720);
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []); // Run once on mount, cleanup on unmount
 
+  /**
+   * Store Leaflet map instance reference when map is created
+   * Allows programmatic map control (zoom, pan, etc.)
+   */
   const handleMapCreated = (mapInstance) => {
     mapRef.current = mapInstance;
     setMapReady(true);
   };
 
-  /* ------- Map data with strong guards ------- */
+  // ============================================================================
+  // Data Processing (Memoized)
+  // ============================================================================
+  
+  /**
+   * Extract and sanitize site border polygon from map data
+   * Multiple fallback paths handle different data structure versions
+   * Memoized to avoid recalculation on every render
+   */
   const siteBorder = useMemo(() => {
     const raw = mapData?.areas?.siteBorder || mapData?.siteBorder || mapData?.border || [];
     const cleaned = sanitizePolygonCoords(raw);
@@ -249,8 +337,13 @@ export default function Sitemap() {
       console.warn("siteBorder provided but contained no valid [lat,lng] pairs.");
     }
     return cleaned;
-  }, []);
+  }, []); // Process once on mount
 
+  /**
+   * Process conservation areas from map data
+   * Filters out siteBorder and invalid entries, applies styling
+   * Memoized to avoid recalculation on every render
+   */
   const areas = useMemo(() => {
     const rawAreas = mapData?.areas || {};
     const areaEntries = Object.entries(rawAreas).filter(([key, value]) => 
@@ -268,8 +361,13 @@ export default function Sitemap() {
       },
       coords: sanitizePolygonCoords(coords),
     })).filter((a) => a.coords.length > 0);
-  }, []);
+  }, []); // Process once on mount
 
+  /**
+   * Process points of interest (POIs) from map data
+   * Validates coordinates and audio sources, filters invalid entries
+   * Memoized to avoid recalculation on every render
+   */
   const pois = useMemo(() => {
     const rawPois = Array.isArray(mapData?.pois) ? mapData.pois : [];
     const cleaned = rawPois.filter(
@@ -288,8 +386,13 @@ export default function Sitemap() {
           : null;
       return { ...poi, audioSrc: audio };
     });
-  }, []);
+  }, []); // Process once on mount
 
+  /**
+   * Calculate map center point
+   * Uses explicit center if provided, otherwise falls back to first border point or first POI
+   * Final fallback is conservation site coordinates
+   */
   const center = useMemo(() => {
     const c = mapData?.center;
     if (c && typeof c.lat === "number" && typeof c.lng === "number") {
@@ -297,12 +400,19 @@ export default function Sitemap() {
     }
     if (siteBorder.length) return [siteBorder[0][0], siteBorder[0][1]];
     if (pois.length) return [pois[0].lat, pois[0].lng];
-    return [44.623917, -63.920472]; // fallback
-  }, [siteBorder, pois]);
+    // Fallback: conservation site coordinates (71 St. Pauls Lane)
+    return [44.623917, -63.920472];
+  }, [siteBorder, pois]); // Recalculate if border or POIs change
 
-  /* ------- Geolocation ------- */
+  // ============================================================================
+  // Geolocation State
+  // ============================================================================
+  
+  // Track whether geolocation watch is active
   const [watching, setWatching] = useState(false);
+  // Current user position from geolocation API
   const [userPos, setUserPos] = useState(null);
+  // Store watchPosition ID for cleanup
   const watchIdRef = useRef(null);
 
   const startWatch = () => {

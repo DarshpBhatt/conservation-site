@@ -23,6 +23,7 @@ A modern, responsive website for the Woodland Conservation Area featuring intera
 - **Azure Cognitive Services** - Text-to-speech
 - **Tailwind CSS** - Styling
 - **Framer Motion** - Animations
+- **Cypress** - Testing framework
 
 ## Getting Started
 
@@ -61,6 +62,8 @@ A modern, responsive website for the Woodland Conservation Area featuring intera
 - `npm run dev` - Start development server
 - `npm run build` - Build for production
 - `npm run preview` - Preview production build
+- `npm run cypress:open` - Open Cypress Test Runner
+- `npm run cypress:run` - Run Cypress tests headlessly
 
 ## Project Structure
 
@@ -70,7 +73,33 @@ src/
 ├── assets/         # Images and static assets
 ├── data/           # JSON data files
 └── utils/          # Utility functions
+cypress/
+├── component/      # Component tests
+├── e2e/            # End-to-end tests
+├── fixtures/       # Test fixtures
+└── support/        # Cypress support files
 ```
+
+## Testing
+
+The project uses Cypress for both component and end-to-end testing.
+
+### Running Tests
+
+- **Open Cypress Test Runner**: `npm run cypress:open`
+- **Run tests headlessly**: `npm run cypress:run`
+
+### Test Structure
+
+- **Component Tests**: Located in `cypress/component/` - Test individual React components in isolation
+- **E2E Tests**: Located in `cypress/e2e/` - Test full user workflows and page interactions
+
+### Test Coverage
+
+- Homepage component and page
+- Ecology component and page
+- Footer component
+- Sitemap/Map page
 
 ## Deployment
 
@@ -121,6 +150,11 @@ The project is also configured for Netlify deployment via `netlify.toml`.
 - Instead, configure environment variables in your hosting platform:
   - **Netlify**: Dashboard → Site settings → Environment variables
   - **Azure**: Configuration → Application settings
+
+## Sources
+
+**Ecology Section:**
+Natural History of the French Village Conservation Woodland. A Report to the French Village Conservation Woodland Committee by David Patriquin, Jess Lewis, Livy Fraser, Liam Holwell, Rohan Kariyawansa. Nov. 2021
 
 ## License
 

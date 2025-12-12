@@ -1,22 +1,55 @@
-// Purpose: Weather widget component to display current weather at the conservation site
+/**
+ * ================================================================================
+ * File: WeatherWidget.jsx
+ * Author: ADM (Abhishek Darsh Manar) 2025 Fall - Software Engineering (CSCI-3428-1)
+ * Description: Weather display component fetching current conditions from Open-Meteo API
+ * with 15-minute caching to reduce API calls and improve performance.
+ * ================================================================================
+ */
 
 import React, { useState, useEffect } from "react";
 import { IoLocationOutline } from "react-icons/io5";
 import { FaSun, FaCloud, FaCloudRain, FaSnowflake, FaSmog, FaMoon } from "react-icons/fa";
 import { fetchWeatherApi } from "openmeteo";
 
+// ============================================================================
+// WeatherWidget Component
+// ============================================================================
+
+/**
+ * WeatherWidget Component - Displays current weather conditions at conservation site
+ * @returns {JSX.Element}
+ */
 const WeatherWidget = () => {
+  // ============================================================================
+  // State Management
+  // ============================================================================
+  
   const [weather, setWeather] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // ============================================================================
+  // Constants
+  // ============================================================================
+  
   // Conservation site coordinates (71 St. Pauls Lane, French Village, NS)
   const lat = 44.623917;
   const lon = -63.920472;
   const CACHE_KEY = "weather_cache";
-  const CACHE_DURATION = 15 * 60 * 1000; // 15 minutes in milliseconds
+  // Cache duration: 15 minutes to balance freshness with API call reduction
+  const CACHE_DURATION = 15 * 60 * 1000;
 
-  // Map WMO weather codes to weather conditions
+  // ============================================================================
+  // Utility Functions
+  // ============================================================================
+  
+  /**
+   * Map WMO weather interpretation codes to readable weather conditions
+   * WMO codes are standard numeric codes used by meteorological services
+   * @param {number} code - WMO weather code (0-99)
+   * @returns {Object} Object with main condition and description
+   */
   const getWeatherFromCode = (code) => {
     // WMO Weather interpretation codes (WW)
     // 0: Clear sky
@@ -45,7 +78,11 @@ const WeatherWidget = () => {
     return { main: "Clouds", description: "cloudy" };
   };
 
-  // Check if cached data is still valid
+  /**
+   * Retrieve cached weather data if still valid
+   * Returns null if cache is expired or missing
+   * @returns {Object|null} Cached weather data or null
+   */
   const getCachedWeather = () => {
     try {
       const cached = localStorage.getItem(CACHE_KEY);
@@ -62,7 +99,10 @@ const WeatherWidget = () => {
     return null;
   };
 
-  // Save weather data to cache
+  /**
+   * Save weather data to localStorage with timestamp
+   * @param {Object} data - Weather data to cache
+   */
   const setCachedWeather = (data) => {
     try {
       localStorage.setItem(CACHE_KEY, JSON.stringify({
@@ -74,8 +114,17 @@ const WeatherWidget = () => {
     }
   };
 
+  // ============================================================================
+  // Data Fetching & Side Effects
+  // ============================================================================
+  
+  /**
+   * Fetch weather data on mount and set up refresh interval
+   * Checks cache first to avoid unnecessary API calls
+   * Empty dependency array: fetch once on mount, then every 15 minutes
+   */
   useEffect(() => {
-    // Try to load from cache first
+    // Load from cache first for instant display
     const cachedWeather = getCachedWeather();
     if (cachedWeather) {
       setWeather(cachedWeather);
@@ -83,6 +132,10 @@ const WeatherWidget = () => {
       setLoading(false);
     }
 
+    /**
+     * Fetch current weather from Open-Meteo API
+     * Open-Meteo is free and doesn't require API keys
+     */
     const fetchWeather = async () => {
       try {
         const params = {
@@ -98,8 +151,7 @@ const WeatherWidget = () => {
         const response = responses[0];
         const current = response.current();
 
-        // Get current weather data
-        // Note: The order of weather variables in the URL query and the indices below need to match!
+        // Extract weather data - variable order must match API request order
         const temperature_2m = current.variables(0).value();
         const weather_code = current.variables(1).value();
         const is_day = current.variables(2).value();
@@ -139,16 +191,27 @@ const WeatherWidget = () => {
       }
     };
 
-    // Only fetch if we don't have cached data
+    // Only fetch from API if cache is missing or expired
     if (!cachedWeather) {
       fetchWeather();
     }
     
-    // Refresh every 15 minutes (reduced from 10 to minimize API calls)
+    // Set up refresh interval: fetch every 15 minutes to keep data current
     const interval = setInterval(fetchWeather, 900000);
     return () => clearInterval(interval);
-  }, []);
+  }, []); // Empty array: setup once on mount
 
+  // ============================================================================
+  // Rendering Helpers
+  // ============================================================================
+  
+  /**
+   * Get appropriate weather icon based on condition and time of day
+   * Shows sun/moon for clear weather, specific icons for other conditions
+   * @param {string} weatherMain - Main weather condition (Clear, Clouds, Rain, etc.)
+   * @param {number} isDay - 1 for day, 0 for night
+   * @returns {JSX.Element} Weather icon component
+   */
   const getWeatherIcon = (weatherMain, isDay) => {
     // For clear weather, show sun during day and moon at night
     // isDay can be 1 (day) or 0 (night) from Open-Meteo API
@@ -172,6 +235,11 @@ const WeatherWidget = () => {
     return iconMap[weatherMain] || <FaSun className="text-lg text-amber-400" />;
   };
 
+  // ============================================================================
+  // Render
+  // ============================================================================
+  
+  // Show loading spinner while fetching initial data
   if (loading) {
     return (
       <div className="flex items-center gap-2 text-xs text-slate-600 dark:text-slate-300">
@@ -190,7 +258,21 @@ const WeatherWidget = () => {
     );
   }
 
-  // Determine if it's day or night - use API value if available, otherwise calculate from current time
+  // Show fallback message if weather data unavailable
+  if (error || !weather) {
+    return (
+      <div className="flex items-center gap-2 text-xs text-slate-600 dark:text-slate-300">
+        <IoLocationOutline />
+        <span className="hidden sm:inline">Weather unavailable</span>
+      </div>
+    );
+  }
+
+  /**
+   * Determine if it's day or night for icon selection
+   * Uses API value if available, otherwise calculates from current time
+   * @returns {boolean} True if day, false if night
+   */
   const getIsDay = () => {
     if (weather.is_day !== undefined) {
       return weather.is_day === 1 || weather.is_day === true;

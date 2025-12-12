@@ -1,4 +1,11 @@
-// Purpose: Shop page component displaying apple picking, berry picking, and jam products
+/**
+ * ================================================================================
+ * File: Shop.jsx
+ * Author: ADM (Abhishek Darsh Manar) 2025 Fall - Software Engineering (CSCI-3428-1)
+ * Description: Shop page displaying seasonal produce and handmade products from
+ * the conservation area with Azure text-to-speech for accessibility.
+ * ================================================================================
+ */
 
 import React, { useState, useRef, useEffect } from "react";
 import { FaApple, FaLeaf } from "react-icons/fa";
@@ -10,9 +17,15 @@ import pinCherryImage from "../assets/Shop/Pin Cherry.jpg";
 import jamsImage from "../assets/Shop/Jams.jpg";
 import wildPearTreeImage from "../assets/Shop/wild pear tree.jpg";
 
+// ============================================================================
+// Constants & Configuration
+// ============================================================================
+
+// Reusable glass morphism styling
 const glassPanel =
   "rounded-3xl border border-white/40 bg-white/60 p-6 shadow-lg shadow-slate-900/10 backdrop-blur-2xl transition-colors duration-300 dark:border-slate-700/60 dark:bg-slate-900/55";
 
+// Shop items with seasonal availability information
 const shopItems = [
   {
     id: "apple-picking",
@@ -56,21 +69,41 @@ const shopItems = [
   },
 ];
 
+// ============================================================================
+// Shop Component
+// ============================================================================
+
+/**
+ * Shop Component - Display seasonal produce and products
+ * @returns {JSX.Element}
+ */
 export default function Shop() {
-  // AUDIO STATES
+  // ============================================================================
+  // State Management
+  // ============================================================================
+  
+  // Text-to-speech state
   const [isSpeaking, setIsSpeaking] = useState(false);
   const synthesizerRef = useRef(null);
   const playerRef = useRef(null);
 
-  // INIT AZURE TTS
+  // ============================================================================
+  // Azure Text-to-Speech Initialization
+  // ============================================================================
+  
+  /**
+   * Initialize Azure Speech SDK on component mount
+   * Only initializes if API keys are present
+   */
   useEffect(() => {
-    const speechKey = import.meta.env.VITE_AZURE_SPEECH_KEY;
-    const speechRegion = import.meta.env.VITE_AZURE_REGION;
+    try {
+      const speechKey = import.meta.env.VITE_AZURE_SPEECH_KEY;
+      const speechRegion = import.meta.env.VITE_AZURE_REGION;
 
-    if (!speechKey || !speechRegion) {
-      console.warn("Azure Speech key/region missing");
-      return;
-    }
+      // Silently fail if keys missing - error shown when user clicks play
+      if (!speechKey || !speechRegion) {
+        return;
+      }
 
     const speechConfig = SpeechSDK.SpeechConfig.fromSubscription(
       speechKey,
@@ -94,9 +127,17 @@ export default function Shop() {
       synthesizerRef.current = null;
       playerRef.current = null;
     };
-  }, []);
+  }, []); // Initialize once on mount
 
-  // PLAY AUDIO
+  // ============================================================================
+  // Event Handlers
+  // ============================================================================
+  
+  /**
+   * Play header audio narration
+   * Note: This component doesn't have try-catch alerts like others
+   * Consider adding error handling for consistency
+   */
   const playHeaderAudio = () => {
     const synthesizer = synthesizerRef.current;
     const player = playerRef.current;

@@ -1,17 +1,33 @@
-/* src/utils/geo.js
-   Purpose: Geospatial helpers for Woodland site.
-   - haversineMeters: distance (m) between two lat/lng points
-   - pointInPolygon: ray-casting point-in-polygon test
-   - distanceToPolygonMeters: approx min distance from point to polygon edge
-   - getClosestPoiWithinRadius: nearest POI within a given radius (m)
-*/
+/**
+ * ================================================================================
+ * File: geo.js
+ * Author: ADM (Abhishek Darsh Manar) 2025 Fall - Software Engineering (CSCI-3428-1)
+ * Description: Geospatial utility functions for calculating distances, point-in-polygon
+ * tests, and finding nearest points of interest. Used by map components for location
+ * services and proximity detection.
+ * ================================================================================
+ */
 
-// --- Distance between two lat/lng points (meters) ---
+// ============================================================================
+// Distance Calculations
+// ============================================================================
+
+/**
+ * Calculate great-circle distance between two lat/lng points using Haversine formula
+ * Accurate for distances up to ~20,000 km on Earth's surface
+ * @param {number} lat1 - Latitude of first point
+ * @param {number} lon1 - Longitude of first point
+ * @param {number} lat2 - Latitude of second point
+ * @param {number} lon2 - Longitude of second point
+ * @returns {number} Distance in meters
+ */
 export function haversineMeters(lat1, lon1, lat2, lon2) {
   const toRad = (d) => (d * Math.PI) / 180;
-  const R = 6371000; // meters
+  // Earth's radius in meters (mean radius)
+  const R = 6371000;
   const dLat = toRad(lat2 - lat1);
   const dLon = toRad(lon2 - lon1);
+  // Haversine formula: a = sin²(Δlat/2) + cos(lat1) * cos(lat2) * sin²(Δlon/2)
   const a =
     Math.sin(dLat / 2) ** 2 +
     Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
@@ -19,19 +35,31 @@ export function haversineMeters(lat1, lon1, lat2, lon2) {
   return R * c;
 }
 
-// --- Point in polygon (lat/lng array of [lat,lng]) ---
+// ============================================================================
+// Polygon Operations
+// ============================================================================
+
+/**
+ * Determine if a point is inside a polygon using ray-casting algorithm
+ * Ray-casting is efficient and handles complex polygons correctly
+ * @param {Object} point - Point object with lat and lng properties
+ * @param {Array<Array<number>>} polygon - Array of [lat, lng] coordinate pairs
+ * @returns {boolean} True if point is inside polygon
+ */
 export function pointInPolygon(point, polygon) {
-  // polygon: [[lat,lng], [lat,lng], ...]
   const x = point.lng;
   const y = point.lat;
   let inside = false;
 
+  // Ray-casting: count edge intersections with horizontal ray from point
+  // Odd number of intersections = inside, even = outside
   for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
     const xi = polygon[i][1],
       yi = polygon[i][0];
     const xj = polygon[j][1],
       yj = polygon[j][0];
 
+    // Check if ray crosses this edge
     const intersect =
       yi > y !== yj > y &&
       x < ((xj - xi) * (y - yi)) / (yj - yi + 0.0) + xi;
@@ -40,26 +68,42 @@ export function pointInPolygon(point, polygon) {
   return inside;
 }
 
-// --- Approx min distance from point to polygon (meters) ---
+/**
+ * Calculate minimum distance from point to polygon edge
+ * Returns 0 if point is inside polygon, otherwise distance to nearest edge
+ * @param {Object} point - Point object with lat and lng properties
+ * @param {Array<Array<number>>} polygon - Array of [lat, lng] coordinate pairs
+ * @returns {number} Distance in meters
+ */
 export function distanceToPolygonMeters(point, polygon) {
-  // If inside, distance is 0
+  // If point is inside polygon, distance is zero
   if (pointInPolygon(point, polygon)) return 0;
 
-  // Otherwise, min distance to each segment (planar approx -> then scale)
+  // Find minimum distance to any polygon edge segment
   let min = Infinity;
   for (let i = 0; i < polygon.length; i++) {
     const a = polygon[i];
-    const b = polygon[(i + 1) % polygon.length];
+    const b = polygon[(i + 1) % polygon.length]; // Wrap to first point for last edge
     const d = _distancePointToSegmentMeters(point, a, b);
     if (d < min) min = d;
   }
   return min;
 }
 
+/**
+ * Calculate distance from point to line segment (internal helper)
+ * Uses equirectangular projection for local coordinate conversion
+ * @param {Object} p - Point {lat, lng}
+ * @param {Array<number>} a - Segment start [lat, lng]
+ * @param {Array<number>} b - Segment end [lat, lng]
+ * @returns {number} Distance in meters
+ */
 function _distancePointToSegmentMeters(p, a, b) {
-  // Convert to rough meters using local projection (simple equirectangular)
-  const latScale = 111320; // meters per deg latitude
-  const lonScale = 111320 * Math.cos(((a[0] + b[0]) / 2) * (Math.PI / 180)); // meters per deg longitude near segment
+  // Convert lat/lng to approximate meters using equirectangular projection
+  // This is accurate for small distances (conservation site scale)
+  const latScale = 111320; // meters per degree latitude (constant globally)
+  // Longitude scale varies by latitude - calculate for segment midpoint
+  const lonScale = 111320 * Math.cos(((a[0] + b[0]) / 2) * (Math.PI / 180));
 
   const px = p.lng * lonScale;
   const py = p.lat * latScale;
@@ -74,24 +118,45 @@ function _distancePointToSegmentMeters(p, a, b) {
   const apy = py - ay;
 
   const ab2 = abx * abx + aby * aby;
+  // Project point onto line segment, clamp to segment endpoints
   const t = Math.max(0, Math.min(1, (apx * abx + apy * aby) / (ab2 || 1)));
+  // Closest point on segment
   const cx = ax + t * abx;
   const cy = ay + t * aby;
 
+  // Distance from point to closest point on segment
   const dx = px - cx;
   const dy = py - cy;
   return Math.sqrt(dx * dx + dy * dy);
 }
 
-// --- Nearest POI within radius (m). Returns { poi, distance } or null ---
+// ============================================================================
+// Point of Interest (POI) Operations
+// ============================================================================
+
+/**
+ * Find nearest point of interest within specified radius
+ * Used by map component to detect when user is near trail markers
+ * @param {Array<Object>} pois - Array of POI objects with lat and lng properties
+ * @param {Object} user - User location object with lat and lng properties
+ * @param {number} radiusMeters - Search radius in meters
+ * @returns {Object|null} Object with poi and distance properties, or null if none found
+ */
 export function getClosestPoiWithinRadius(pois, user, radiusMeters) {
+  // Validate inputs
   if (!user || !Array.isArray(pois) || !pois.length) return null;
+  
   let closest = null;
   let best = Infinity;
 
+  // Linear search through all POIs to find closest within radius
+  // For small POI sets (<100), linear search is faster than spatial indexing
   for (const poi of pois) {
+    // Skip POIs with invalid coordinates
     if (typeof poi.lat !== "number" || typeof poi.lng !== "number") continue;
+    
     const d = haversineMeters(user.lat, user.lng, poi.lat, poi.lng);
+    // Update closest if within radius and closer than previous best
     if (d <= radiusMeters && d < best) {
       best = d;
       closest = { poi, distance: d };

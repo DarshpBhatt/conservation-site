@@ -1,8 +1,21 @@
+/**
+ * ================================================================================
+ * File: Footer.jsx
+ * Author: ADM (Abhishek Darsh Manar) 2025 Fall - Software Engineering (CSCI-3428-1)
+ * Description: Site footer component displaying navigation links, contact information,
+ * and social media links with responsive grid layout.
+ * ================================================================================
+ */
+
 import React from "react";
 import { Link } from "react-router-dom";
 import { FaFacebook, FaInstagram } from "react-icons/fa";
 import { FaXTwitter } from "react-icons/fa6";
 
+/**
+ * Footer Component - Site footer with links and contact information
+ * @returns {JSX.Element}
+ */
 export default function Footer() {
   return (
     <footer className="rounded-3xl border border-white/40 bg-white/60 p-6 text-xs text-slate-500 shadow-lg shadow-slate-900/10 backdrop-blur-2xl dark:border-slate-700/60 dark:bg-slate-900/55 dark:text-slate-300">
