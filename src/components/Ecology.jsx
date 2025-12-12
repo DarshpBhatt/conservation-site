@@ -271,9 +271,16 @@ const Ecology = () => {
       // This alert check can be removed after VITE_AZURE_SPEECH_KEY and VITE_AZURE_REGION
       // are properly set in environment variables (Netlify/Azure dashboard or .env file)
       // ============================================================================
-      if (!speechKey || !speechRegion) {
-        setAlertMessage("Azure Speech API keys are missing. Please update VITE_AZURE_SPEECH_KEY and VITE_AZURE_REGION in your environment variables (Netlify/Azure dashboard) or .env file for local development.");
-        setTimeout(() => setAlertMessage(null), 8000);
+      // Check if keys are missing or contain placeholder values
+      const hasPlaceholderKeys = !speechKey || !speechRegion || 
+        speechKey.toLowerCase().includes('keyhere') || 
+        speechKey.toLowerCase().includes('your_azure') ||
+        speechRegion.toLowerCase().includes('regionhere') ||
+        speechRegion.toLowerCase().includes('your_azure');
+      
+      if (hasPlaceholderKeys) {
+        setAlertMessage("Azure Speech API keys are missing or invalid. Please update VITE_AZURE_SPEECH_KEY and VITE_AZURE_REGION with valid keys in your environment variables (Netlify/Azure dashboard) or .env file for local development.");
+        setTimeout(() => setAlertMessage(null), 10000);
         return;
       }
       // ============================================================================
@@ -303,8 +310,9 @@ const Ecology = () => {
         () => setIsSpeaking(false),
         (err) => {
           console.error("Speech error:", err);
-          setAlertMessage("Failed to play audio. Please update your Azure Speech API keys (VITE_AZURE_SPEECH_KEY and VITE_AZURE_REGION) in environment variables.");
-          setTimeout(() => setAlertMessage(null), 8000);
+          // Show alert immediately when WebSocket/API error occurs
+          setAlertMessage("Failed to play audio. Your Azure Speech API keys may be invalid or missing. Please update VITE_AZURE_SPEECH_KEY and VITE_AZURE_REGION with valid keys in your environment variables (Netlify/Azure dashboard) or .env file.");
+          setTimeout(() => setAlertMessage(null), 10000);
           setIsSpeaking(false);
         }
       );
@@ -349,26 +357,28 @@ const Ecology = () => {
             focus on a category, then open a card to view the reference photo.
           </p>
 
-          <div className="space-y-2 mt-4">
-            {alertMessage && (
-              <div className="flex items-start gap-2 rounded-lg border border-amber-400/50 bg-amber-50/90 p-3 text-xs text-amber-800 dark:border-amber-500/50 dark:bg-amber-900/90 dark:text-amber-200">
-                <IoWarningOutline className="mt-0.5 h-4 w-4 flex-shrink-0" />
-                <div className="flex-1">
-                  <p className="font-medium">Azure API Keys Required</p>
-                  <p className="mt-1">{alertMessage}</p>
-                  <p className="mt-2 text-xs">
-                    Configure in Netlify/Azure environment variables or create a <code className="rounded bg-amber-200/50 px-1 dark:bg-amber-800/50">.env</code> file for local development.
-                  </p>
-                </div>
-                <button
-                  onClick={() => setAlertMessage(null)}
-                  className="flex-shrink-0 text-amber-600 hover:text-amber-800 dark:text-amber-400 dark:hover:text-amber-200"
-                  aria-label="Dismiss"
-                >
-                  <IoClose className="h-4 w-4" />
-                </button>
+          {/* Alert message - shows when API keys are missing or invalid */}
+          {alertMessage && (
+            <div className="mb-4 flex items-start gap-2 rounded-lg border-2 border-amber-500/70 bg-amber-50/95 p-4 text-sm text-amber-900 shadow-lg dark:border-amber-400/70 dark:bg-amber-900/95 dark:text-amber-100 z-50">
+              <IoWarningOutline className="mt-0.5 h-5 w-5 flex-shrink-0 text-amber-600 dark:text-amber-400" />
+              <div className="flex-1">
+                <p className="font-semibold text-base">Azure API Keys Required</p>
+                <p className="mt-1.5 text-sm">{alertMessage}</p>
+                <p className="mt-2 text-xs text-amber-700 dark:text-amber-300">
+                  Configure in Netlify/Azure environment variables or create a <code className="rounded bg-amber-200/60 px-1.5 py-0.5 dark:bg-amber-800/60">.env</code> file for local development.
+                </p>
               </div>
-            )}
+              <button
+                onClick={() => setAlertMessage(null)}
+                className="flex-shrink-0 text-amber-700 hover:text-amber-900 dark:text-amber-300 dark:hover:text-amber-100 transition-colors"
+                aria-label="Dismiss"
+              >
+                <IoClose className="h-5 w-5" />
+              </button>
+            </div>
+          )}
+          
+          <div className="space-y-2 mt-4">
             <div className="flex gap-3">
               <button
                 type="button"

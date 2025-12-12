@@ -153,10 +153,16 @@ export default function Shop() {
       // This alert check can be removed after VITE_AZURE_SPEECH_KEY and VITE_AZURE_REGION
       // are properly set in environment variables (Netlify/Azure dashboard or .env file)
       // ============================================================================
-      // Check for API keys before attempting playback
-      if (!speechKey || !speechRegion) {
-        setAlertMessage("Azure Speech API keys are missing. Please update VITE_AZURE_SPEECH_KEY and VITE_AZURE_REGION in your environment variables (Netlify/Azure dashboard) or .env file for local development.");
-        setTimeout(() => setAlertMessage(null), 8000);
+      // Check if keys are missing or contain placeholder values
+      const hasPlaceholderKeys = !speechKey || !speechRegion || 
+        speechKey.toLowerCase().includes('keyhere') || 
+        speechKey.toLowerCase().includes('your_azure') ||
+        speechRegion.toLowerCase().includes('regionhere') ||
+        speechRegion.toLowerCase().includes('your_azure');
+      
+      if (hasPlaceholderKeys) {
+        setAlertMessage("Azure Speech API keys are missing or invalid. Please update VITE_AZURE_SPEECH_KEY and VITE_AZURE_REGION with valid keys in your environment variables (Netlify/Azure dashboard) or .env file for local development.");
+        setTimeout(() => setAlertMessage(null), 10000);
         return;
       }
       // ============================================================================
@@ -185,8 +191,9 @@ export default function Shop() {
         () => setIsSpeaking(false),
         (err) => {
           console.error("Speech error:", err);
-          setAlertMessage("Failed to play audio. Please update your Azure Speech API keys (VITE_AZURE_SPEECH_KEY and VITE_AZURE_REGION) in environment variables.");
-          setTimeout(() => setAlertMessage(null), 8000);
+          // Show alert immediately when WebSocket/API error occurs
+          setAlertMessage("Failed to play audio. Your Azure Speech API keys may be invalid or missing. Please update VITE_AZURE_SPEECH_KEY and VITE_AZURE_REGION with valid keys in your environment variables (Netlify/Azure dashboard) or .env file.");
+          setTimeout(() => setAlertMessage(null), 10000);
           setIsSpeaking(false);
         }
       );
